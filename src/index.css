@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Inter:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Your custom styles here */
+/* Hide the scrollbar */
+::-webkit-scrollbar {
+    width: 0px; /* Set the width of the scrollbar to 0 */
+    height: 0px; /* Set the height of the scrollbar to 0 */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: transparent; /* Ensure the scrollbar thumb is transparent */
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent; /* Ensure the scrollbar track is transparent */
+  }
