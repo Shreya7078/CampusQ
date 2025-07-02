@@ -14,41 +14,53 @@ const SignUp = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [adminRole, setAdminRole] = useState('');
   const [role, setRole] = useState('student'); // Local state for role
+  const [showMessageBox, setShowMessageBox] = useState(false);
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
 
   // Set role based on location state on mount
   useEffect(() => {
-    const initialRole = location.state?.role || 'student';
+    const initialRole = location.state?.role || (location.pathname.includes('/admin-signup') ? 'admin' : 'student');
     setRole(initialRole);
-    console.log('Initial role from state:', initialRole); // Debug log
-  }, [location.state]);
+    console.log('Initial role from state or path:', initialRole); // Debug log
+  }, [location.state, location.pathname]);
 
   const handleSignUp = (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      alert('Passwords do not match!');
+      setMessage('Passwords do not match!');
+      setShowMessageBox(true);
+      setTimeout(() => {
+        setShowMessageBox(false);
+      }, 5000); // 5 seconds for failure message
       return;
     }
     console.log('Sign-up attempt:', { role, fullName, email, password, studentId, department, year, phoneNumber, adminRole });
-    alert('Sign-up successful! (Mock)');
-    // Redirect based on role
+    setMessage('Sign-up successful! (Mock)');
+    setShowMessageBox(true);
+    setTimeout(() => {
+      setShowMessageBox(false);
+      const redirectPath = role === 'admin' ? '/admin-login' : '/student-login';
+      navigate(redirectPath);
+      console.log('Redirecting to:', redirectPath); // Debug log
+    }, 2000); // 2 seconds for success message before redirect
+  };
+
+  const handleloginClick = () => {
+    // Redirect to role-specific login page based on current role
     const redirectPath = role === 'admin' ? '/admin-login' : '/student-login';
-    navigate(redirectPath);
-    console.log('Redirecting to:', redirectPath); // Debug log
+    navigate(redirectPath, { state: { role } }); // Pass role in state
   };
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-white">
-      <div className="flex-1 flex items-center justify-center pt-14"> 
+      <div className="flex-1 flex items-center justify-center pt-14 mb-3"> 
         <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 hover:shadow-3xl">
           <div className="flex items-center justify-center mb-4">
             <School className="text-indigo-600 w-10 h-10 mr-2" />
             <h1 className="text-2xl font-poppins font-bold text-indigo-800">CampusQ</h1>
           </div>
-          {/* <h2 className="text-xl font-bold text-center text-indigo-800 mb-4">
-            {role === 'admin' ? 'Create Admin Account' : 'Create Student Account'}
-          </h2> */}
           <form onSubmit={handleSignUp} className="space-y-3">
             <div className="flex space-x-4">
               <div className="w-1/2">
@@ -182,10 +194,21 @@ const SignUp = () => {
               <span>Sign Up</span>
               <ArrowRight size={18} />
             </button>
+            <div className="mt-4 sm:mt-6 text-center">
+              <p className="text-gray-700 text-sm sm:text-sm">Already have an account? <span onClick={handleloginClick} className="text-indigo-700 text-md hover:text-indigo-800 hover:underline underline cursor-pointer">Login</span></p>
+            </div>
           </form>
         </div>
       </div>
       <Footer className="h-10" /> {/* Reduced height to 48px (3rem) */}
+      {/* Message Box */}
+      {showMessageBox && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white bg-opacity-90 p-4 rounded-lg shadow-lg w-3/4 sm:w-1/2 md:w-1/3 lg:w-1/5 max-h-1/2 border border-indigo-200 bg-gradient-to-br from-indigo-50 via-purple-50 to-white text-center">
+            <p className="text-indigo-800 text-sm sm:text-md font-poppins whitespace-pre break-words p-2 overflow-auto">{message}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

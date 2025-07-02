@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AlertTriangle, Users, BarChart2, User, Search, Plus } from 'lucide-react';
 import { gsap } from 'gsap';
 
@@ -20,8 +20,20 @@ const AdminDashboard = () => {
   const [editUser, setEditUser] = useState(null);
   const [editQuery, setEditQuery] = useState(null);
   const contentRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Authentication check
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    const userRole = localStorage.getItem('userRole');
+
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else if (userRole !== 'admin') {
+      navigate('/dashboard'); // Redirect to dashboard or login if not admin
+    }
+
+    // Animation
     const ctx = gsap.context(() => {
       gsap.from(contentRef.current.children, {
         duration: 1,
@@ -32,7 +44,7 @@ const AdminDashboard = () => {
       });
     });
     return () => ctx.revert();
-  }, []);
+  }, [navigate]);
 
   const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -102,7 +114,7 @@ const AdminDashboard = () => {
                   <th className="p-3 text-left w-1/4">Title</th>
                   <th className="p-3 text-left">Status</th>
                   <th className="p-3 text-left">Assigned To</th>
-                  <th className="p-3 text-left w-1/7 ml-aut0">Date</th>
+                  <th className="p-3 text-left w-1/7 ml-auto">Date</th>
                   <th className="p-3 text-left">Action</th>
                 </tr>
               </thead>

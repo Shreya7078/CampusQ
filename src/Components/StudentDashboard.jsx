@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Bell, FileText, Activity, AlertTriangle } from 'lucide-react';
 import { gsap } from 'gsap';
 
@@ -11,8 +11,20 @@ const StudentDashboard = () => {
   ]);
   const [notifications, setNotifications] = useState(['Query #1 updated to In Progress']);
   const contentRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Authentication check
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    const userRole = localStorage.getItem('userRole');
+
+    if (!isAuthenticated) {
+      navigate('/student-login');
+    } else if (userRole !== 'student') {
+      navigate('/dashboard'); // Redirect to dashboard or login if not student
+    }
+
+    // Animation
     const ctx = gsap.context(() => {
       gsap.from(contentRef.current.children, {
         duration: 1,
@@ -23,11 +35,11 @@ const StudentDashboard = () => {
       });
     });
     return () => ctx.revert();
-  }, []);
+  }, [navigate]);
 
   return (
     <div ref={contentRef}>
-      <h2 className="text-4xl font-bold mb-6 -mt-7 text-gray-900 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Welcome, Shreya!</h2>
+      <h2 className="text-4xl font-bold mb-6 -mt-7 text-gray-900 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent overflow-hidden">Welcome, Student!</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Quick Stats Card */}
         <div className="bg-white p-6 rounded-xl shadow-2xl hover:shadow-indigo-300/50 transition-shadow border border-indigo-100">

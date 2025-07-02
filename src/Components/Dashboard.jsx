@@ -8,21 +8,60 @@ import StudentDashboard from './StudentDashboard';
 import AdminDashboard from './AdminDashboard';
 import { Link } from 'react-router-dom';
 
+const LoginSelection = () => {
+  const navigate = useNavigate();
+
+  const handleStudentLogin = () => {
+    navigate('/student-login');
+  };
+
+  const handleAdminLogin = () => {
+    navigate('/admin-login');
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-white via-purple-50 to-blue-100 flex items-center justify-center">
+      <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+        <h2 className="text-2xl font-semibold text-indigo-800 mb-4">Please Log In</h2>
+        <p className="text-gray-600 mb-6">Select your role to proceed:</p>
+        <button
+          onClick={handleStudentLogin}
+          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 mr-2"
+        >
+          Login as Student
+        </button>
+        <button
+          onClick={handleAdminLogin}
+          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+        >
+          Login as Admin
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const Dashboard = () => {
-  const [role, setRole] = useState('student'); // Default, will be updated from location state
+  const [role, setRole] = useState('student'); // Default, will be updated from location state or localStorage
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State to control sidebar visibility
   const sidebarRef = useRef(null);
   const contentRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Set role based on location state on mount
+  // Set role based on location state or localStorage on mount
   useEffect(() => {
-    const initialRole = location.state?.role || (location.pathname === '/admin-dashboard' ? 'admin' : 'student');
+    const storedRole = localStorage.getItem('userRole');
+    const initialRole = location.state?.role || storedRole || (location.pathname === '/admin-dashboard' ? 'admin' : 'student');
     setRole(initialRole);
     console.log('Dashboard location state:', location.state); // Debug full state
     console.log('Dashboard role from state or path:', initialRole); // Debug role
-  }, [location.state, location.pathname]);
+
+    // Protect route: Show LoginSelection if not authenticated
+    if (!localStorage.getItem('isAuthenticated')) {
+      // Do not redirect, just render LoginSelection
+    }
+  }, [location.state, location.pathname, navigate]);
 
   // Handle sidebar toggle and media query for desktop
   useEffect(() => {
@@ -30,7 +69,7 @@ const Dashboard = () => {
       if (window.innerWidth >= 768) { // md breakpoint
         setIsSidebarOpen(true); // Always open on desktop
       } else {
-        // Mobile view, controlled by state
+        setIsSidebarOpen(false); // Closed by default on mobile
       }
     };
 
@@ -39,33 +78,70 @@ const Dashboard = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Initial animation for desktop view
   useEffect(() => {
-    // Animation context for cleanup
-    const ctx = gsap.context(() => {
-      // Sidebar Animation (Slide in from left)
-      gsap.from(sidebarRef.current, {
-        duration: 1,
-        x: isSidebarOpen ? 0 : -200,
-        opacity: isSidebarOpen ? 1 : 0,
-        ease: 'power2.out',
-      });
+    if (sidebarRef.current && isSidebarOpen && window.innerWidth >= 768) {
+      gsap.fromTo(
+        sidebarRef.current,
+        { x: -600, opacity: 0, scale: 0.9 },
+        {
+          duration: 0.6, // Increased for smoother transition
+          x: 0,
+          opacity: 1,
+          scale: 1,
+          ease: 'power2.out', // Smooth slowdown at end
+          onStart: () => {
+            sidebarRef.current.style.display = 'block';
+            sidebarRef.current.style.willChange = 'transform, opacity, scale';
+          },
+          onComplete: () => {
+            sidebarRef.current.style.willChange = 'auto';
+          }
+        }
+      );
+    }
+  }, [isSidebarOpen]); // Trigger on initial isSidebarOpen change
 
-      // Content Cards Animation
-      gsap.from(contentRef.current?.children, {
-        duration: 1,
-        y: 50,
-        opacity: 0,
-        stagger: 0.2,
-        ease: 'power2.out',
-      });
-    });
-
-    return () => ctx.revert(); // Cleanup GSAP animations
-  }, [isSidebarOpen]);
-
+  // Handle sidebar animation manually on toggle with optimized performance
   const handleSidebarToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+    if (sidebarRef.current) {
+      const tl = gsap.timeline({ force3D: true });
+      setIsSidebarOpen(prev => {
+        const newState = !prev;
+        tl.to(sidebarRef.current, {
+          duration: 0.3, // Reduced to minimize lag
+          x: newState ? 0 : -500,
+          opacity: newState ? 1 : 0,
+          ease: 'linear',
+          onStart: () => {
+            if (newState) {
+              sidebarRef.current.style.display = 'block';
+              sidebarRef.current.style.willChange = 'transform, opacity';
+            }
+          },
+          onComplete: () => {
+            if (!newState) {
+              sidebarRef.current.style.display = 'none';
+              sidebarRef.current.style.willChange = 'auto';
+            }
+          }
+        }).play();
+        return newState;
+      });
+    }
   };
+
+  // Logout handler
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userRole');
+    navigate('/'); // Redirect to home page
+  };
+
+  // Render LoginSelection if not authenticated, else render dashboard content
+  if (!localStorage.getItem('isAuthenticated')) {
+    return <LoginSelection />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-purple-50 to-blue-100 font-inter text-gray-800 relative">
@@ -92,7 +168,7 @@ const Dashboard = () => {
               <div className="w-16 h-16 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
                 <User className="w-12 h-12 text-indigo-800" />
               </div>
-              <p className="text-md font-medium mt-2">{role === 'admin' ? 'Admin' : 'Shreya'}</p>
+              <p className="text-md font-medium mt-2">{role === 'admin' ? 'Admin' : 'User'}</p>
             </div>
             <nav className="space-y-2 w-full">
               {role === 'student' ? (
@@ -119,7 +195,12 @@ const Dashboard = () => {
                   <hr className="border-t border-gray-500 my-1" />
                   <Link to="/settings" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><Settings className="w-5 h-5 mr-2" /> Settings</Link>
                   <hr className="border-t border-gray-500 my-1" />
-                  <Link to="/logout" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><User className="w-5 h-5 mr-2" /> Logout</Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"
+                  >
+                    <User className="w-5 h-5 mr-2" /> Logout
+                  </button>
                 </>
               ) : (
                 <>
@@ -143,7 +224,12 @@ const Dashboard = () => {
                   <hr className="border-t border-gray-500 my-1" />
                   <Link to="/settings" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><Settings className="w-5 h-5 mr-2" /> Settings</Link>
                   <hr className="border-t border-gray-500 my-1" />
-                  <Link to="/logout" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><User className="w-5 h-5 mr-2" /> Logout</Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"
+                  >
+                    <User className="w-5 h-5 mr-2" /> Logout
+                  </button>
                 </>
               )}
             </nav>
