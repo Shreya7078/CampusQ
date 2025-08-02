@@ -1,7 +1,7 @@
 import { useLayoutEffect, useState } from 'react';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { Link } from 'react-router-dom';
-import Footer from './Footer';
+import Footer from '../Components/Footer';
 
 
 import { School, FileText, Users, Bell, Menu, User, X, Facebook, Twitter, Instagram, Home } from 'lucide-react';
@@ -210,14 +210,13 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen font-inter bg-gradient-to-br from-purple-100 via-blue-50 to-white relative overflow-x-hidden">
-      {/* <Navbar/> */}
-      {/* Decorative Background Shape */}
+ 
       <div className="absolute -top-20 -left-20 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
       <div className="absolute top-1/2 -right-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
 
       
 
-      {/* Hero */}
+   
       <section className="pt-28 pb-16 flex flex-col md:flex-row items-center justify-between container mx-auto px-20">
         <div className="hero-text md:w-1/2 text-center md:text-left">
           <h2 className="text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-pink-500 text-transparent bg-clip-text font-poppins">
@@ -255,13 +254,13 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Floating Icon */}
-      <div
+      
+      {/* <div
         className="floating-icon absolute top-20 px-16 left-5 hidden md:block"
         style={{ willChange: 'transform' }}
       >
         <Home className="w-10 h-10 text-indigo-500" />
-      </div>
+      </div> */}
 
       {/* Features */}
       <section className="py-16 bg-gradient-to-br from-white to-purple-50">

@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Bell, FileText, User, Menu, X, BarChart2, Activity, AlertTriangle, Users, Settings } from 'lucide-react';
-import Navbar from './Navbar';
-import Footer from './Footer';
+import Navbar from '../Components/Navbar';
+import Footer from '../Components/Footer';
 import { gsap } from 'gsap';
-import StudentDashboard from './StudentDashboard';
-import AdminDashboard from './AdminDashboard';
+import StudentDashboard from '../pages/StudentDashboard';
+import AdminDashboard from '../pages/AdminDashboard';
 import { Link } from 'react-router-dom';
 
 const LoginSelection = () => {
