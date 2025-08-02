@@ -217,7 +217,7 @@ const LandingPage = () => {
       
 
    
-      <section className="pt-28 pb-16 flex flex-col md:flex-row items-center justify-between container mx-auto px-4 md:px-20">
+      <section className="pt-28 pb-16 flex flex-col md:flex-row items-center justify-between container mx-auto px-20">
         <div className="hero-text md:w-1/2 text-center md:text-left">
           <h2 className="text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-pink-500 text-transparent bg-clip-text font-poppins">
             Empower Your Campus Life, Instantly!
