@@ -17,7 +17,7 @@ body {
   margin: 0 auto;
   padding: 0 1rem;
 }
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .hero-text h2 {
     font-size: 2rem;
   }
@@ -32,7 +32,7 @@ body {
     width: 100%;
     margin-bottom: 0.5rem;
   }
-}
+} */
 
 ::-webkit-scrollbar {
     width: 0px; /* Set the width of the scrollbar to 0 */
