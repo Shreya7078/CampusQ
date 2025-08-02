@@ -8,8 +8,32 @@
 * {
   box-sizing: border-box;
 }
-/* Your custom styles here */
-/* Hide the scrollbar */
+body {
+  margin: 0;
+  padding: 0;
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+@media (max-width: 768px) {
+  .hero-text h2 {
+    font-size: 2rem;
+  }
+  .hero-animation {
+    width: 100%;
+    height: auto;
+  }
+  .hero-buttons {
+    flex-direction: column;
+  }
+  .hero-buttons button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
 ::-webkit-scrollbar {
     width: 0px; /* Set the width of the scrollbar to 0 */
     height: 0px; /* Set the height of the scrollbar to 0 */
