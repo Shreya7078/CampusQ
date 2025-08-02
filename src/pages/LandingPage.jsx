@@ -13,9 +13,9 @@ const LandingPage = () => {
 
   useLayoutEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-    console.log('GSAP and ScrollTrigger initialized');
 
-    // Hero Animation (Smooth pop-in with fade)
+
+
     gsap.fromTo(
       '.hero-text',
       { y: 30, opacity: 0, scale: 0.8 },
@@ -32,21 +32,21 @@ const LandingPage = () => {
       { duration: 1.5, y: 0, opacity: 1, scale: 1, delay: 0.4, ease: 'elastic.out(1, 0.3)', clearProps: 'all' }
     );
 
-    // Floating Icon Animation (Gentle pop and rotate)
-    gsap.fromTo(
-      '.floating-icon',
-      { y: 20, opacity: 0, scale: 0.7 },
-      { duration: 1.5, y: 0, opacity: 1, scale: 1, ease: 'elastic.out(1, 0.3)', clearProps: 'all' }
-    );
-    gsap.to('.floating-icon', {
-      y: 10,
-      rotation: 360,
-      repeat: -1,
-      yoyo: true,
-      duration: 3,
-      ease: 'power2.inOut',
-      willChange: 'transform',
-    });
+    // // Floating Icon Animation (Gentle pop and rotate)
+    // gsap.fromTo(
+    //   '.floating-icon',
+    //   { y: 20, opacity: 0, scale: 0.7 },
+    //   { duration: 1.5, y: 0, opacity: 1, scale: 1, ease: 'elastic.out(1, 0.3)', clearProps: 'all' }
+    // );
+    // gsap.to('.floating-icon', {
+    //   y: 10,
+    //   rotation: 360,
+    //   repeat: -1,
+    //   yoyo: true,
+    //   duration: 3,
+    //   ease: 'power2.inOut',
+    //   willChange: 'transform',
+    // });
 
     // Features Animation (Pop-up with scale and slide)
     gsap.utils.toArray('.feature-card').forEach((card, index) => {

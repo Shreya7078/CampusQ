@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+
+* {
+  box-sizing: border-box;
+}
 /* Your custom styles here */
 /* Hide the scrollbar */
 ::-webkit-scrollbar {
