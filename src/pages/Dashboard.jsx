@@ -42,34 +42,34 @@ const LoginSelection = () => {
 };
 
 const Dashboard = () => {
-  const [role, setRole] = useState('student'); // Default, will be updated from location state or localStorage
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State to control sidebar visibility
+  const [role, setRole] = useState('student'); 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
   const sidebarRef = useRef(null);
   const contentRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Set role based on location state or localStorage on mount
+ 
   useEffect(() => {
     const storedRole = localStorage.getItem('userRole');
     const initialRole = location.state?.role || storedRole || (location.pathname === '/admin-dashboard' ? 'admin' : 'student');
     setRole(initialRole);
-    console.log('Dashboard location state:', location.state); // Debug full state
-    console.log('Dashboard role from state or path:', initialRole); // Debug role
+    console.log('Dashboard location state:', location.state); 
+    console.log('Dashboard role from state or path:', initialRole); 
 
-    // Protect route: Show LoginSelection if not authenticated
+    
     if (!localStorage.getItem('isAuthenticated')) {
-      // Do not redirect, just render LoginSelection
+      
     }
   }, [location.state, location.pathname, navigate]);
 
-  // Handle sidebar toggle and media query for desktop
+ 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) { // md breakpoint
-        setIsSidebarOpen(true); // Always open on desktop
+      if (window.innerWidth >= 768) { 
+        setIsSidebarOpen(true); 
       } else {
-        setIsSidebarOpen(false); // Closed by default on mobile
+        setIsSidebarOpen(false); 
       }
     };
 
