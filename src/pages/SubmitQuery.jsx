@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '../context/QueryContext';
 
+
 const SubmitQuery = () => {
   const [formData, setFormData] = useState({
     category: 'Hostel',

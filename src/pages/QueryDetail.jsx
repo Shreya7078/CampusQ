@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '../Context/QueryContext';
+import { useQuery } from '../context/QueryContext';
 
 const QueryDetail = () => {
   const { id } = useParams();

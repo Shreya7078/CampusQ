@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Bell, FileText, Activity, AlertTriangle } from 'lucide-react';
 import { gsap } from 'gsap';
-import { useQuery } from '../Context/QueryContext';
+import { useQuery } from '../context/QueryContext';
 
 const StudentDashboard = () => {
   const contentRef = useRef(null);

@@ -6,7 +6,7 @@ import Footer from './Components/Footer';
 import Login from './pages/Login';
 import SignUp from './pages/Signup';
 import SubmitQuery from './pages/SubmitQuery';
-import { QueryProvider } from './Context/QueryContext';
+import { QueryProvider } from "./context/QueryContext";
 import QueryDetail from './pages/QueryDetail';
 
 
