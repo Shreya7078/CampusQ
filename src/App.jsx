@@ -5,28 +5,36 @@ import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import Login from './pages/Login';
 import SignUp from './pages/Signup';
+import SubmitQuery from './pages/SubmitQuery';
+import { QueryProvider } from './Context/QueryContext';
+import QueryDetail from './pages/QueryDetail';
 
 
 function App() {
   return (
     <>
-      
-      <BrowserRouter>
-      <Navbar/>
-        <Routes>
-          <Route path="/" element={<LandingPage />}employing />
-          <Route path="/student-login" element={<Login />} />
-          <Route path="/admin-login" element={<Login />} />
-          <Route path="/student-dashboard" element={<Dashboard />} /> 
-          <Route path="/admin-dashboard" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/student-dashboard" element={<Dashboard />} />
-          <Route path="/admin-dashboard" element={<Dashboard />} />
+      <QueryProvider>
+        <BrowserRouter>
+        <Navbar/>
+        
+          <Routes>
+            <Route path="/" element={<LandingPage />}employing />
+            <Route path="/student-login" element={<Login />} />
+            <Route path="/admin-login" element={<Login />} />
+            <Route path="/student-dashboard" element={<Dashboard />} /> 
+            <Route path="/admin-dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/student-dashboard" element={<Dashboard />} />
+            <Route path="/admin-dashboard" element={<Dashboard />} />
+            <Route path="/submit-query" element={<SubmitQuery />} />
+            <Route path="/query/:id" element={<QueryDetail />} />
 
-        </Routes>
-        {/* <Footer /> */}
-      </BrowserRouter>
+          </Routes>
+        
+          {/* <Footer /> */}
+        </BrowserRouter>
+      </QueryProvider>
     </>
   );
 }
