@@ -62,38 +62,40 @@ const AdminDashboard = () => {
 
     // Chart setup
     const ctx = chartRef.current?.getContext('2d');
-    if (ctx && chartInstance.current) {
-      chartInstance.current.destroy();
-    }
-    if (ctx && queries.length > 0) {
-      chartInstance.current = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Pending', 'In Progress', 'Resolved'],
-          datasets: [{
-            label: 'Query Status',
-            data: [
-              queries.filter(q => q.status === 'Pending').length,
-              queries.filter(q => q.status === 'In Progress').length,
-              queries.filter(q => q.status === 'Resolved').length
-            ],
-            backgroundColor: ['#4B5EAA', '#A3BFFA', '#81C784'],
-            borderColor: ['#2A4066', '#6B91D7', '#4CAF50'],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: false,
-          plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: 'Query Status Overview' }
+    if (ctx) {
+      if (chartInstance.current) {
+        chartInstance.current.destroy();
+      }
+      if (queries.length > 0) {
+        chartInstance.current = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Pending', 'In Progress', 'Resolved'],
+            datasets: [{
+              label: 'Query Status',
+              data: [
+                queries.filter(q => q.status === 'Pending').length,
+                queries.filter(q => q.status === 'In Progress').length,
+                queries.filter(q => q.status === 'Resolved').length
+              ],
+              backgroundColor: ['#4B5EAA', '#A3BFFA', '#81C784'],
+              borderColor: ['#2A4066', '#6B91D7', '#4CAF50'],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+              legend: { position: 'top' },
+              title: { display: true, text: 'Query Status Overview' }
+            }
           }
-        }
-      });
+        });
+      }
     }
-  }, [navigate]); // Added navigate as dependency to ensure effect runs on navigation changes
+  }, [navigate, queries]); // Added queries as dependency to update chart on query changes
 
   const filteredUsers = users.filter(user =>
     user && user.name && typeof user.name === 'string' && user.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -178,8 +180,8 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div ref={contentRef} className="p-4 sm:p-6  min-h-screen">
-      <h2 className="text-4xl font-bold -mt-5 mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-700 to-pink-500 ">Welcome, Admin!</h2>
+    <div ref={contentRef} className="p-4 sm:p-6 min-h-screen">
+      <h2 className="text-4xl font-bold -mt-5 mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-700 to-pink-500">Welcome, Admin!</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Manage Queries Card */}
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-indigo-400/40 transition-all duration-300 border border-indigo-100 lg:col-span-3">
@@ -253,7 +255,7 @@ const AdminDashboard = () => {
                     <td className="p-4 flex space-x-3">
                       <button
                         onClick={() => (editQuery && editQuery.id === q.id ? handleSaveQuery() : handleEditQuery(q))}
-                        className="px-3 bg-gradient-to-r from-blue-800 to-blue-500 py-1.5  text-white rounded-lg shadow-md hover:from-blue-700 hover:to-blue-400 hover:shadow-lg transition-all duration-200"
+                        className="px-3 bg-gradient-to-r from-blue-800 to-blue-500 py-1.5 text-white rounded-lg shadow-md hover:from-blue-700 hover:to-blue-400 hover:shadow-lg transition-all duration-200"
                       >
                         {editQuery && editQuery.id === q.id ? 'Save' : 'Edit'}
                       </button>
