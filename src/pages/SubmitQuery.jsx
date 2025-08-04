@@ -2,107 +2,121 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '../context/QueryContext';
 
-
 const SubmitQuery = () => {
+  const navigate = useNavigate();
+  const { dispatch } = useQuery();
   const [formData, setFormData] = useState({
-    category: 'Hostel',
+    category: '',
     title: '',
     description: '',
     priority: 'Medium',
     attachment: null,
   });
-  const navigate = useNavigate();
-  const { state: { dispatch } } = useQuery() || { state: { dispatch: () => console.log('Dispatch not available') } }; // Fallback
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === 'attachment' && files) {
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, [name]: reader.result }); // Stores as base64
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form Data:', formData); // Debug: Check form data
-    if (!dispatch) {
-      console.error('Dispatch is not available. Check QueryContext setup.');
-      return;
-    }
     const newQuery = {
-      id: Date.now(),
+      id: Date.now(), // Temporary ID
       ...formData,
-      status: 'Pending',
       date: new Date().toISOString().split('T')[0],
+      status: 'Pending',
+      attachment: formData.attachment, // Base64 data
     };
     dispatch({ type: 'ADD_QUERY', payload: newQuery });
-    console.log('Query Dispatched:', newQuery); // Debug: Confirm dispatch
     navigate('/student-dashboard');
-  };
-
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, attachment: e.target.files[0] });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center p-6" style={{ backdropFilter: 'blur(5px)' }}>
       <div className="bg-white/30 backdrop-blur-md p-8 rounded-xl shadow-2xl border border-white/20 max-w-md w-full transform transition-all duration-300 hover:shadow-indigo-300/50 mt-20">
-        <h2 className="text-3xl font-bold mb-6 text-transparent bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-center">Submit New Query</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <h2 className="text-3xl font-montserrat font-bold mb-6 text-transparent bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-center">Submit New Query</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-800 mb-2">Category</label>
+            <label className="block text-gray-800 mb-2 font-poppins font-semibold"><strong>Category:</strong></label>
             <select
+              name="category"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className={`w-full p-3 bg-gray-100/10 border border-gray-300 rounded-lg ${formData.category !== '' ? 'text-gray-800' : 'text-gray-400'} placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-              required
+              onChange={handleChange}
+              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="Hostel" className="text-gray-800">Hostel</option>
-              <option value="Mess" className="text-gray-800">Mess</option>
-              <option value="Library" className="text-gray-800">Library</option>
-              <option value="Network" className="text-gray-800">Network</option>
+              <option value="">Select Category</option>
+              <option value="Library">Library</option>
+              <option value="Network">Network</option>
+              <option value="Hostel">Hostel</option>
+              <option value="Mess">Mess</option>
             </select>
           </div>
           <div>
-            <label className="block text-gray-800 mb-2">Title</label>
+            <label className="block text-gray-800 mb-2 font-poppins font-semibold"><strong>Title:</strong></label>
             <input
               type="text"
+              name="title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className={`w-full p-3 bg-gray-100/10 border border-gray-300 rounded-lg ${formData.title !== '' ? 'text-gray-800' : 'text-gray-200'} placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-              maxLength={100}
-              placeholder="Enter query title"
-              required
+              onChange={handleChange}
+              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter  focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Enter title"
             />
           </div>
           <div>
-            <label className="block text-gray-800 mb-2">Description</label>
+            <label className="block text-gray-800 mb-2 font-poppins font-semibold"><strong>Description:</strong></label>
             <textarea
+              name="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className={`w-full p-3 bg-gray-100/10 border border-gray-300 rounded-lg ${formData.description !== '' ? 'text-gray-800' : 'text-gray-200'} placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-              maxLength={500}
-              rows={1}
-              placeholder="Describe your issue"
-              required
+              onChange={handleChange}
+              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter  focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              rows={4}
+              placeholder="Enter description"
             />
           </div>
           <div>
-            <label className="block text-gray-800 mb-2">Priority</label>
+            <label className="block text-gray-800 mb-2 font-poppins font-semibold"><strong>Priority:</strong></label>
             <select
+              name="priority"
               value={formData.priority}
-              onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className={`w-full p-3 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+              onChange={handleChange}
+              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter  focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="Low" className="text-gray-800">Low</option>
-              <option value="Medium" className="text-gray-800">Medium</option>
-              <option value="High" className="text-gray-800">High</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
             </select>
           </div>
           <div>
-            <label className="block text-gray-800 mb-2">Attachment (Image/PDF)</label>
+            <label className="block text-gray-800 mb-2 font-poppins font-semibold"><strong>Attachment:</strong></label>
             <input
               type="file"
-              accept="image/*,application/pdf"
-              onChange={handleFileChange}
-              className="w-full cursor-pointer p-3 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-400 file:bg-gradient-to-r file:from-indigo-600 file:to-pink-500 file:text-white file:border-none file:rounded file:mr-4 file:px-4 hover:file:from-indigo-700 hover:file:to-pink-600"
+              name="attachment"
+              onChange={handleChange}
+              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter  focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+            {formData.attachment && (
+              <div className="mt-2">
+                <p className="text-gray-600 font-poppins">Attachment Preview:</p>
+                {formData.attachment.startsWith('data:image') ? (
+                  <img src={formData.attachment} alt="Preview" className="mt-2 max-w-full h-auto rounded-lg" />
+                ) : (
+                  <p className="text-gray-600 font-poppins">Preview available only for images.</p>
+                )}
+              </div>
+            )}
           </div>
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-indigo-600 to-pink-500 text-white py-3 rounded-lg hover:from-indigo-700 hover:to-pink-600 transition-all duration-300"
+            className="w-full bg-gradient-to-r from-indigo-600 to-pink-500 text-white py-2 rounded-lg hover:from-indigo-700 hover:to-pink-600 transition-all duration-300 font-poppins font-bold"
           >
             Submit Query
           </button>

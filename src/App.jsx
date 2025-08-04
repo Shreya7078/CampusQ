@@ -8,6 +8,7 @@ import SignUp from './pages/Signup';
 import SubmitQuery from './pages/SubmitQuery';
 import { QueryProvider } from "./context/QueryContext";
 import QueryDetail from './pages/QueryDetail';
+import NotFound from './pages/NotFound';
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
             <Route path="/admin-dashboard" element={<Dashboard />} />
             <Route path="/submit-query" element={<SubmitQuery />} />
             <Route path="/query/:id" element={<QueryDetail />} />
+            <Route path="*" element={<NotFound />} />
 
           </Routes>
         

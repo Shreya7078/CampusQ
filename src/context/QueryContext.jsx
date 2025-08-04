@@ -18,6 +18,9 @@ const queryReducer = (state, action) => {
       const updatedQueriesDelete = state.queries.filter(q => q.id !== action.payload.id);
       localStorage.setItem('queries', JSON.stringify(updatedQueriesDelete));
       return { ...state, queries: updatedQueriesDelete };
+    case 'ADD_NOTIFICATION':
+      const updatedNotifications = [...state.notifications, action.payload];
+      return { ...state, notifications: updatedNotifications };
     default:
       return state;
   }
