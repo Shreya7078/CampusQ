@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AlertTriangle, Users, BarChart2, User, Search, Plus, Bell } from 'lucide-react';
 import { gsap } from 'gsap';
 import Chart from 'chart.js/auto';
@@ -15,87 +15,68 @@ const AdminDashboard = () => {
   const [notifications, setNotifications] = useState([]);
   const contentRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
   // Logout Function
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userRole'); // Ensure userRole is also removed
-    navigate('/', { replace: true }); // Use replace to avoid back navigation
+    localStorage.removeItem('userRole');
+    navigate('/', { replace: true });
   };
 
+  // Initial load and navigation check
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     const userRole = localStorage.getItem('userRole');
 
-    console.log('useEffect triggered - isAuthenticated:', isAuthenticated, 'userRole:', userRole);
-    if (!isAuthenticated) {
-      navigate('/', { replace: true }); // Immediate redirect if not authenticated
-      return; // Exit early to avoid further execution
-    } else if (userRole !== 'admin') {
-      navigate('/dashboard', { replace: true });
-      return; // Exit early to avoid further execution
+    if (!isAuthenticated || userRole !== 'admin') {
+      navigate('/', { replace: true }); // Immediate redirect
+      return;
     }
 
-    // Load data from localStorage or set default
+    // Load data
     const savedQueries = JSON.parse(localStorage.getItem('queries') || '[]');
     const savedUsers = JSON.parse(localStorage.getItem('users') || '[]');
     const savedNotifications = JSON.parse(localStorage.getItem('notifications') || '[]');
-    console.log('Saved Queries:', savedQueries);
-    console.log('Saved Users:', savedUsers);
-    console.log('Saved Notifications:', savedNotifications);
-    if (savedQueries.length > 0) setQueries(savedQueries);
-    else setQueries([
-      { id: 1, category: 'Hostel', title: 'Wi-Fi Issue', status: 'Pending', date: '2025-06-28', assignedTo: 'Admin1', studentId: 'S001' },
-      { id: 2, category: 'Mess', title: 'Food Complaint', status: 'Resolved', date: '2025-06-27', assignedTo: 'Admin2', studentId: 'S002' },
-      { id: 3, category: 'Library', title: 'Book Delay', status: 'Pending', date: '2025-06-29', assignedTo: 'Admin1', studentId: 'S003' },
-    ]);
-    if (savedUsers.length > 0) setUsers(savedUsers);
-    else setUsers([
-      { id: 1, name: 'User1', role: 'Student', department: 'Computer Science', studentId: 'S001' },
-      { id: 2, name: 'User2', role: 'Admin', adminRole: 'Hostel Manager' },
-      { id: 3, name: 'User3', role: 'Student', department: 'Electronics', studentId: 'S002' },
-      { id: 4, name: 'User4', role: 'Student', department: 'Mechanical', studentId: 'S003' },
-    ]);
-    if (savedNotifications.length > 0) setNotifications(savedNotifications);
 
-    // Chart setup
+    setQueries(savedQueries);
+    setUsers(savedUsers);
+    setNotifications(savedNotifications);
+
+    // Defer chart setup
     const ctx = chartRef.current?.getContext('2d');
     if (ctx) {
-      if (chartInstance.current) {
-        chartInstance.current.destroy();
-      }
-      if (queries.length > 0) {
-        chartInstance.current = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['Pending', 'In Progress', 'Resolved'],
-            datasets: [{
-              label: 'Query Status',
-              data: [
-                queries.filter(q => q.status === 'Pending').length,
-                queries.filter(q => q.status === 'In Progress').length,
-                queries.filter(q => q.status === 'Resolved').length
-              ],
-              backgroundColor: ['#4B5EAA', '#A3BFFA', '#81C784'],
-              borderColor: ['#2A4066', '#6B91D7', '#4CAF50'],
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-            plugins: {
-              legend: { position: 'top' },
-              title: { display: true, text: 'Query Status Overview' }
-            }
-          }
-        });
-      }
+      if (chartInstance.current) chartInstance.current.destroy();
+      chartInstance.current = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Pending', 'In Progress', 'Resolved'],
+          datasets: savedQueries.length > 0
+            ? [{
+                label: 'Query Status',
+                data: [
+                  savedQueries.filter(q => q.status === 'Pending').length,
+                  savedQueries.filter(q => q.status === 'In Progress').length,
+                  savedQueries.filter(q => q.status === 'Resolved').length
+                ],
+                backgroundColor: ['#4B5EAA', '#A3BFFA', '#81C784'],
+                borderColor: ['#2A4066', '#6B91D7', '#4CAF50'],
+                borderWidth: 1
+              }]
+            : [{ label: '', data: [0, 0, 0], backgroundColor: 'rgba(0,0,0,0)', borderColor: 'rgba(0,0,0,0)' }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          plugins: { legend: { position: 'top', display: savedQueries.length > 0 }, title: { display: true, text: 'Query Status Overview' } },
+          scales: { x: { display: true }, y: { display: true, beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+      });
     }
-  }, [navigate, queries]); // Added queries as dependency to update chart on query changes
+  }, []);
 
   const filteredUsers = users.filter(user =>
     user && user.name && typeof user.name === 'string' && user.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -153,7 +134,6 @@ const AdminDashboard = () => {
 
   const handleSaveQuery = () => {
     if (editQuery) {
-      // Remove validation alert for studentId and assignedTo
       const updatedQueries = queries.map(query =>
         query.id === editQuery.id ? { ...editQuery } : query
       );
@@ -180,7 +160,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div ref={contentRef} className="p-4 sm:p-6 min-h-screen">
+    <div ref={contentRef} className="p-4 sm:p-6 min-h-screen pt-20">
       <h2 className="text-4xl font-bold -mt-5 mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-700 to-pink-500">Welcome, Admin!</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Manage Queries Card */}

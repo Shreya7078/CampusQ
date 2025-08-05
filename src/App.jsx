@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Navbar from './Components/Navbar';
@@ -6,34 +6,37 @@ import Footer from './Components/Footer';
 import Login from './pages/Login';
 import SignUp from './pages/Signup';
 import SubmitQuery from './pages/SubmitQuery';
-import { QueryProvider } from "./context/QueryContext";
+import { QueryProvider } from './context/QueryContext';
 import QueryDetail from './pages/QueryDetail';
 import NotFound from './pages/NotFound';
 
-
 function App() {
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  const userRole = localStorage.getItem('userRole');
+
   return (
     <>
       <QueryProvider>
         <BrowserRouter>
-        <Navbar/>
-        
+          <Navbar />
           <Routes>
-            <Route path="/" element={<LandingPage />}employing />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/student-login" element={<Login />} />
             <Route path="/admin-login" element={<Login />} />
-            <Route path="/student-dashboard" element={<Dashboard />} /> 
-            <Route path="/admin-dashboard" element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route
+              path="/student-dashboard"
+              element={isAuthenticated && userRole === 'student' ? <Dashboard /> : <Navigate to="/dashboard" replace />}
+            />
+            <Route
+              path="/admin-dashboard"
+              element={isAuthenticated && userRole === 'admin' ? <Dashboard /> : <Navigate to="/dashboard" replace />}
+            />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/student-dashboard" element={<Dashboard />} />
-            <Route path="/admin-dashboard" element={<Dashboard />} />
             <Route path="/submit-query" element={<SubmitQuery />} />
             <Route path="/query/:id" element={<QueryDetail />} />
             <Route path="*" element={<NotFound />} />
-
           </Routes>
-        
           {/* <Footer /> */}
         </BrowserRouter>
       </QueryProvider>
