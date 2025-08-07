@@ -9,7 +9,7 @@ import SubmitQuery from './pages/SubmitQuery';
 import { QueryProvider } from './context/QueryContext';
 import QueryDetail from './pages/QueryDetail';
 import NotFound from './pages/NotFound';
-import SupportPage from './pages/SupportPage';
+// import SupportPage from './pages/SupportPage';
 
 function App() {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -33,7 +33,7 @@ function App() {
               path="/admin-dashboard"
               element={isAuthenticated && userRole === 'admin' ? <Dashboard /> : <Navigate to="/dashboard" replace />}
             />
-            <Route path="/support" element={<SupportPage />} />
+            {/* <Route path="/support" element={<SupportPage />} /> */}
             <Route path="/signup" element={<SignUp />} />
             <Route path="/submit-query" element={<SubmitQuery />} />
             <Route path="/query/:id" element={<QueryDetail />} />
