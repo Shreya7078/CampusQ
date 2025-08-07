@@ -2,8 +2,6 @@ import { useLayoutEffect, useState } from 'react';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { Link } from 'react-router-dom';
 import Footer from '../Components/Footer';
-
-
 import { School, FileText, Users, Bell, Menu, User, X, Facebook, Twitter, Instagram, Home } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -13,8 +11,6 @@ const LandingPage = () => {
 
   useLayoutEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-
-
 
     gsap.fromTo(
       '.hero-text',
@@ -32,25 +28,7 @@ const LandingPage = () => {
       { duration: 1.5, y: 0, opacity: 1, scale: 1, delay: 0.4, ease: 'elastic.out(1, 0.3)', clearProps: 'all' }
     );
 
-    // // Floating Icon Animation (Gentle pop and rotate)
-    // gsap.fromTo(
-    //   '.floating-icon',
-    //   { y: 20, opacity: 0, scale: 0.7 },
-    //   { duration: 1.5, y: 0, opacity: 1, scale: 1, ease: 'elastic.out(1, 0.3)', clearProps: 'all' }
-    // );
-    // gsap.to('.floating-icon', {
-    //   y: 10,
-    //   rotation: 360,
-    //   repeat: -1,
-    //   yoyo: true,
-    //   duration: 3,
-    //   ease: 'power2.inOut',
-    //   willChange: 'transform',
-    // });
-
-    // Features Animation (Pop-up with scale and slide)
     gsap.utils.toArray('.feature-card').forEach((card, index) => {
-      // console.log(`Triggering animation for ${card.textContent.trim()}`);
       gsap.fromTo(
         card,
         { y: 30, opacity: 0, scale: 0.8, boxShadow: '0 0 0 rgba(99, 102, 241, 0)' },
@@ -79,7 +57,6 @@ const LandingPage = () => {
       });
     });
 
-    // How It Works Animation (Pop-up with scale and slide)
     gsap.utils.toArray('.step-card').forEach((card, index) => {
       gsap.fromTo(
         card,
@@ -108,7 +85,6 @@ const LandingPage = () => {
       });
     });
 
-    // Testimonials Animation (Pop-up with scale and enhanced hover)
     gsap.utils.toArray('.testimonial-card').forEach((card, index) => {
       gsap.fromTo(
         card,
@@ -141,7 +117,6 @@ const LandingPage = () => {
       });
     });
 
-    // Button Hover Effects
     gsap.utils.toArray('.hero-buttons button').forEach(button => {
       gsap.to(button, { scale: 1.05, duration: 0.5, paused: true, ease: 'power2.inOut' });
       button.animation = gsap.to(button, { scale: 1.05, duration: 0.5, paused: true, ease: 'power2.inOut' });
@@ -149,7 +124,6 @@ const LandingPage = () => {
       button.addEventListener('mouseleave', () => button.animation.reverse());
     });
 
-    // Cleanup
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
       gsap.killTweensOf('.hero-text, .hero-buttons, .hero-animation, .feature-card, .step-card, .testimonial-card, .hero-buttons button, .floating-icon');
@@ -191,7 +165,7 @@ const LandingPage = () => {
       icon: <FileText className="w-12 h-12 mx-auto text-pink-600" />,
     },
     {
-      step: '3. Track/Resolve',
+      step: '3. Track/ Resolve',
       desc: 'Track status or resolve queries (for admins).',
       icon: <Bell className="w-12 h-12 mx-auto text-pink-600" />,
     },
@@ -210,13 +184,9 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen font-inter bg-gradient-to-br from-purple-100 via-blue-50 to-white relative overflow-x-hidden">
- 
       <div className="absolute -top-20 -left-20 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
       <div className="absolute top-1/2 -right-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
 
-      
-
-   
       <section className="pt-28 pb-16 flex flex-col md:flex-row items-center justify-between container mx-auto px-20">
         <div className="hero-text md:w-1/2 text-center md:text-left">
           <h2 className="text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-pink-500 text-transparent bg-clip-text font-poppins">
@@ -226,15 +196,13 @@ const LandingPage = () => {
             Tackle hostel, mess, network, and library issues effortlessly—get swift solutions from admins!
           </p>
           <div className="hero-buttons mt-6 flex justify-center md:justify-start gap-4">
-            
-          <Link to="/student-login">
+            <Link to="/student-login">
               <button
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full font-semibold shadow-md"
               >
                 Student Login
               </button>
-          </Link>
-            
+            </Link>
             <Link to="/admin-login">
               <button
                 className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-full font-semibold shadow-md"
@@ -254,15 +222,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      
-      {/* <div
-        className="floating-icon absolute top-20 px-16 left-5 hidden md:block"
-        style={{ willChange: 'transform' }}
-      >
-        <Home className="w-10 h-10 text-indigo-500" />
-      </div> */}
-
-      {/* Features */}
       <section className="py-16 bg-gradient-to-br from-white to-purple-50">
         <div className="container mx-auto px-20">
           <h3 className="text-4xl font-bold text-center text-gray-800 mb-12">Why Choose Us?</h3>
@@ -282,27 +241,25 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* How It Works */}
       <section className="py-16 bg-gradient-to-br from-pink-50 to-white">
         <div className="container mx-auto px-20">
           <h3 className="text-4xl font-bold text-center text-gray-800 mb-12">How It Works</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {steps.map((step, index) => (
               <div
                 key={index}
-                className="step-card bg-white p-6 rounded-2xl shadow-lg text-center hover:shadow-xl transition duration-300"
+                className="step-card bg-white p-4 sm:p-6 rounded-2xl shadow-lg text-center hover:shadow-xl transition duration-300 flex flex-col items-center justify-between h-full"
                 style={{ willChange: 'transform, opacity, boxShadow' }}
               >
                 {step.icon}
-                <h4 className="text-xl font-semibold mt-4">{step.step}</h4>
-                <p className="text-gray-600 mt-2">{step.desc}</p>
+                <h4 className="text-lg sm:text-xl font-semibold mt-3">{step.step}</h4>
+                <p className="text-sm sm:text-base text-gray-600 mt-2 flex-grow">{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
       <section className="py-16 bg-indigo-50">
         <div className="container mx-auto px-20">
           <h3 className="text-4xl font-bold text-center text-gray-800 mb-12">What Our Users Say</h3>
@@ -321,10 +278,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <Footer />
-
-      
     </div>
   );
 };

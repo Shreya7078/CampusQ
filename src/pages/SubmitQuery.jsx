@@ -19,7 +19,7 @@ const SubmitQuery = () => {
       const file = files[0];
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, [name]: reader.result }); // Stores as base64
+        setFormData({ ...formData, [name]: reader.result }); 
       };
       reader.readAsDataURL(file);
     } else {
@@ -30,11 +30,11 @@ const SubmitQuery = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newQuery = {
-      id: Date.now(), // Temporary ID
+      id: Date.now(), 
       ...formData,
       date: new Date().toISOString().split('T')[0],
       status: 'Pending',
-      attachment: formData.attachment, // Base64 data
+      attachment: formData.attachment, 
     };
     dispatch({ type: 'ADD_QUERY', payload: newQuery });
     navigate('/student-dashboard');
@@ -58,6 +58,9 @@ const SubmitQuery = () => {
               <option value="Network">Network</option>
               <option value="Hostel">Hostel</option>
               <option value="Mess">Mess</option>
+              <option value="Transport">Transport</option>
+              <option value="Other">Other</option>
+              
             </select>
           </div>
           <div>
@@ -69,6 +72,7 @@ const SubmitQuery = () => {
               onChange={handleChange}
               className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter  focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Enter title"
+              required
             />
           </div>
           <div>
@@ -80,6 +84,7 @@ const SubmitQuery = () => {
               className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter  focus:outline-none focus:ring-2 focus:ring-indigo-500"
               rows={4}
               placeholder="Enter description"
+              required
             />
           </div>
           <div>

@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AlertTriangle, Users, BarChart2, User, Search, Plus, Bell } from 'lucide-react';
 import { gsap } from 'gsap';
 import Chart from 'chart.js/auto';
+import Navbar from '../Components/Navbar';
 
 const AdminDashboard = () => {
   const [queries, setQueries] = useState([]);
@@ -19,24 +20,24 @@ const AdminDashboard = () => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
-  // Logout Function
+  
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userRole');
     navigate('/', { replace: true });
   };
 
-  // Initial load and navigation check
+
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     const userRole = localStorage.getItem('userRole');
 
     if (!isAuthenticated || userRole !== 'admin') {
-      navigate('/', { replace: true }); // Immediate redirect
+      navigate('/', { replace: true }); 
       return;
     }
 
-    // Load data
+    
     const savedQueries = JSON.parse(localStorage.getItem('queries') || '[]');
     const savedUsers = JSON.parse(localStorage.getItem('users') || '[]');
     const savedNotifications = JSON.parse(localStorage.getItem('notifications') || '[]');
@@ -45,7 +46,7 @@ const AdminDashboard = () => {
     setUsers(savedUsers);
     setNotifications(savedNotifications);
 
-    // Defer chart setup
+    
     const ctx = chartRef.current?.getContext('2d');
     if (ctx) {
       if (chartInstance.current) chartInstance.current.destroy();
@@ -160,10 +161,12 @@ const AdminDashboard = () => {
   };
 
   return (
+    
     <div ref={contentRef} className="p-4 sm:p-6 min-h-screen pt-20">
+
       <h2 className="text-4xl font-bold -mt-5 mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-700 to-pink-500">Welcome, Admin!</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Manage Queries Card */}
+        
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-indigo-400/40 transition-all duration-300 border border-indigo-100 lg:col-span-3">
           <h3 className="text-xl font-semibold mb-5 text-indigo-700 flex items-center"><AlertTriangle className="w-6 h-6 mr-3" /> Manage Queries</h3>
           <div className="overflow-x-auto max-h-96 overflow-y-auto">
@@ -253,7 +256,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Reports Card */}
+        
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-green-400/40 transition-all duration-300 border border-green-100">
           <h3 className="text-xl font-semibold mb-5 text-indigo-700 flex items-center"><BarChart2 className="w-6 h-6 mr-3" /> Reports</h3>
           <div className="h-64" style={{ position: 'relative' }}>
@@ -264,7 +267,7 @@ const AdminDashboard = () => {
           </button>
         </div>
 
-        {/* User Management Card */}
+       
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-purple-400/40 transition-all duration-300 border border-purple-100 lg:col-span-2">
           <h3 className="text-xl font-semibold mb-5 text-indigo-700 flex items-center"><Users className="w-6 h-6 mr-3" /> User Management</h3>
           <div className="mb-5">
@@ -313,7 +316,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Notifications Card */}
+       
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-yellow-400/40 transition-all duration-300 border border-yellow-100 lg:col-span-3">
           <h3 className="text-xl font-semibold mb-5 text-indigo-700 flex items-center"><Bell className="w-6 h-6 mr-3" /> Notifications</h3>
           <div className="overflow-x-auto max-h-48 overflow-y-auto bg-gray-50 p-4 rounded-lg">

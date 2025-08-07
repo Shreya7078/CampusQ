@@ -13,17 +13,16 @@ const SignUp = () => {
   const [year, setYear] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [adminRole, setAdminRole] = useState('');
-  const [role, setRole] = useState('student'); // Local state for role
+  const [role, setRole] = useState('student'); 
   const [showMessageBox, setShowMessageBox] = useState(false);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Set role based on location state on mount
   useEffect(() => {
     const initialRole = location.state?.role || (location.pathname.includes('/admin-signup') ? 'admin' : 'student');
     setRole(initialRole);
-    console.log('Initial role from state or path:', initialRole); // Debug log
+    console.log('Initial role from state or path:', initialRole); 
   }, [location.state, location.pathname]);
 
   const handleSignUp = (e) => {
@@ -33,7 +32,7 @@ const SignUp = () => {
       setShowMessageBox(true);
       setTimeout(() => {
         setShowMessageBox(false);
-      }, 5000); // 5 seconds for failure message
+      }, 5000); 
       return;
     }
     console.log('Sign-up attempt:', { role, fullName, email, password, studentId, department, year, phoneNumber, adminRole });
@@ -43,19 +42,19 @@ const SignUp = () => {
       setShowMessageBox(false);
       const redirectPath = role === 'admin' ? '/admin-login' : '/student-login';
       navigate(redirectPath);
-      console.log('Redirecting to:', redirectPath); // Debug log
-    }, 2000); // 2 seconds for success message before redirect
+      console.log('Redirecting to:', redirectPath); 
+    }, 2000); 
   };
 
   const handleloginClick = () => {
-    // Redirect to role-specific login page based on current role
+    
     const redirectPath = role === 'admin' ? '/admin-login' : '/student-login';
-    navigate(redirectPath, { state: { role } }); // Pass role in state
+    navigate(redirectPath, { state: { role } }); 
   };
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-white">
-      <div className="flex-1 flex items-center justify-center pt-14 mb-3"> 
+      <div className="flex-1 flex items-center justify-center pt-24 pb-4 px-3 mb-3"> 
         <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 hover:shadow-3xl">
           <div className="flex items-center justify-center mb-4">
             <School className="text-indigo-600 w-10 h-10 mr-2" />
@@ -200,8 +199,8 @@ const SignUp = () => {
           </form>
         </div>
       </div>
-      <Footer className="h-10" /> {/* Reduced height to 48px (3rem) */}
-      {/* Message Box */}
+      <Footer className="h-10" /> 
+     
       {showMessageBox && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white bg-opacity-90 p-4 rounded-lg shadow-lg w-3/4 sm:w-1/2 md:w-1/3 lg:w-1/5 max-h-1/2 border border-indigo-200 bg-gradient-to-br from-indigo-50 via-purple-50 to-white text-center">

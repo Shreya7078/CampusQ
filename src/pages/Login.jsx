@@ -11,17 +11,16 @@ const Login = () => {
   const navigate = useNavigate(); 
   const location = useLocation();
 
-  // Determine role based on URL path
   const role = location.pathname === '/admin-login' ? 'admin' : 'student';
 
-  // Determine welcome message based on role
+
   const welcomeMessage = role === 'admin' ? 'Welcome, Admin!' : 'Welcome, Student!';
 
   const handleLogin = (e) => {
     e.preventDefault();
     console.log('Login attempt:', { email, password, role });
 
-    // Hardcoded validation with updated student email
+ 
     const isValid = 
       (email === 'student1@example.com' && password === 'password123' && role === 'student') ||
       (email === 'admin@example.com' && password === 'admin123' && role === 'admin');
@@ -31,7 +30,7 @@ const Login = () => {
       localStorage.setItem('userRole', role || 'student');
       const redirectPath = role === 'admin' ? '/admin-dashboard' : '/student-dashboard';
       navigate(redirectPath);
-      console.log('Redirecting to:', redirectPath); // Debug log
+      console.log('Redirecting to:', redirectPath); 
     } else {
       const validUsers = role === 'admin' 
         ? [{ email: 'admin@example.com', password: 'admin123' }]
@@ -42,13 +41,13 @@ const Login = () => {
   };
 
   const handleSignUpClick = () => {
-    navigate('/signup', { state: { role } }); // Ensure role is passed
+    navigate('/signup', { state: { role } }); 
   };
 
   return (
     <>
       <div className="h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-white flex flex-col">
-        <div className="flex-1 flex items-center justify-center pt-14 sm:mb-4 sm:m-5">
+        <div className="flex-1 flex items-center justify-center  pt-24 pb-8 px-3 sm:mb-4 sm:m-5">
           <div className="bg-white p-5 sm:p-6 rounded-xl shadow-2xl w-full max-w-sm transform transition-all duration-300 hover:shadow-3xl">
             <div className="flex items-center justify-center mb-4 sm:mb-6">
               <School className="text-indigo-600 w-10 sm:w-12 h-10 sm:h-12 mr-1 sm:mr-2" />
@@ -100,10 +99,10 @@ const Login = () => {
             </div>
           </div>
         </div>
-        <Footer className="h-8" /> {/* Maintained height at 32px */}
+        <Footer className="h-8" /> 
       </div>
 
-      {/* Improved Message Box */}
+      
       {showMessageBox && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white bg-opacity-90 p-4 rounded-lg shadow-lg w-3/4 sm:w-1/2 md:w-1/3 lg:w-1/5 max-h-1/2 border border-indigo-200 bg-gradient-to-br from-indigo-50 via-purple-50 to-white text-center relative">

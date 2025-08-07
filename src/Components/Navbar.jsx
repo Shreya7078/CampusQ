@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { School, FileText, Users, Bell, Menu, User, X, Home } from 'lucide-react';
+import { School, Menu, X, User, Home } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 function Navbar({ onSidebarToggle }) {
@@ -7,44 +7,39 @@ function Navbar({ onSidebarToggle }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('isAuthenticated') === 'true');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown
-  const userRole = localStorage.getItem('userRole');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
-    // Update authentication state on every location change or localStorage change
     const handleAuthChange = () => {
       setIsAuthenticated(localStorage.getItem('isAuthenticated') === 'true');
     };
-    handleAuthChange(); // Initial check
-    window.addEventListener('storage', handleAuthChange); // Listen for storage changes
+    handleAuthChange();
+    window.addEventListener('storage', handleAuthChange);
     return () => window.removeEventListener('storage', handleAuthChange);
   }, []);
 
   useEffect(() => {
-    // Force re-render on location change
     console.log('Location changed:', location.pathname);
   }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userRole');
-    setIsAuthenticated(false); // Ensure state updates immediately
-    setIsDropdownOpen(false); // Close dropdown on logout
-    navigate('/'); // Redirect to home page
+    setIsAuthenticated(false);
+    setIsDropdownOpen(false);
+    navigate('/');
   };
 
   const handleLoginClick = (role) => {
     navigate(`/${role === 'admin' ? 'admin-login' : 'student-login'}`, { state: { role } });
-    setIsDropdownOpen(false); // Close dropdown after selection
+    setIsDropdownOpen(false);
   };
 
   const handleHomeClick = () => {
-    if (isAuthenticated) {
-      navigate('/'); // Immediate navigation to home
-    } else {
-      setIsDropdownOpen(!isDropdownOpen); // Toggle dropdown if not authenticated
-    }
+    onSidebarToggle();
   };
+
+  const isDashboardPage = location.pathname === '/dashboard' || location.pathname === '/student-dashboard' || location.pathname === '/admin-dashboard';
 
   return (
     <>
@@ -97,33 +92,18 @@ function Navbar({ onSidebarToggle }) {
               {isMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
             </button>
           </div>
-          <div className="md:hidden relative">
-            <button
-              id="sidebar-toggle"
-              onClick={handleHomeClick}
-              className="text-white focus:outline-none"
-              aria-label="Toggle sidebar"
-            >
-              <Home size={24} />
-            </button>
-            {isDropdownOpen && !isAuthenticated && (
-              <div className="absolute right-0 mt-2 w-48 bg-white text-indigo-700 rounded-md shadow-lg">
-                <button
-                  onClick={() => handleLoginClick('student')}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                >
-                  Login as Student
-                </button>
-                <hr className="border-t border-gray-300" />
-                <button
-                  onClick={() => handleLoginClick('admin')}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                >
-                  Login as Admin
-                </button>
-              </div>
-            )}
-          </div>
+          {isAuthenticated && isDashboardPage && (
+            <div className="md:hidden relative">
+              <button
+                id="sidebar-toggle"
+                onClick={handleHomeClick}
+                className="text-white focus:outline-none"
+                aria-label="Toggle sidebar"
+              >
+                <Home size={24} />
+              </button>
+            </div>
+          )}
           <div className="hidden md:flex items-center">
             <div className="relative px-8">
               <button

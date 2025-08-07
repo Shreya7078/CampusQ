@@ -44,7 +44,7 @@ const StudentDashboard = () => {
     <div ref={contentRef} className="p-4">
       <h2 className="text-4xl font-bold mb-6 pt-2 -mt-7 text-gray-900 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent overflow-hidden ">Welcome, Student!</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Quick Stats Card */}
+        
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-indigo-300/50 transition-shadow border border-indigo-100">
           <h3 className="text-xl font-semibold mb-4 text-indigo-700 flex items-center"><Activity className="w-5 h-5 mr-2" /> Quick Stats</h3>
           <div className="space-y-3">
@@ -53,7 +53,7 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-        {/* Submit Query Card */}
+      
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-pink-300/50 transition-shadow border border-pink-100">
           <h3 className="text-xl font-semibold mb-4 text-indigo-700 flex items-center"><FileText className="w-5 h-5 mr-2" /> Submit New Query</h3>
           <Link to="/submit-query">
@@ -63,7 +63,7 @@ const StudentDashboard = () => {
           </Link>
         </div>
 
-        {/* Recent Activity Card */}
+        
       
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-green-300/50 transition-shadow border border-green-100">
           <h3 className="text-xl font-semibold mb-4 text-indigo-700 flex items-center"><Activity className="w-5 h-5 mr-2" /> Recent Activity</h3>
@@ -77,7 +77,7 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-        {/* My Queries Section */}
+        
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-purple-300/50 transition-shadow lg:col-span-3 border border-purple-100">
           <h3 className="text-xl font-semibold mb-4 text-indigo-700 flex items-center"><AlertTriangle className="w-5 h-5 mr-2" /> My Queries</h3>
           {queries.length === 0 ? (
@@ -105,7 +105,7 @@ const StudentDashboard = () => {
           )}
         </div>
 
-        {/* Notifications Card */}
+        
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-blue-300/50 transition-shadow lg:col-span-3 border border-blue-100">
           <h3 className="text-xl font-semibold mb-4 text-indigo-700 flex items-center"><Bell className="w-5 h-5 mr-2" /> Notifications</h3>
           <div className="space-y-3">
