@@ -19,6 +19,35 @@ const UserManagement = () => {
   // Hydration flag to avoid rendering the table body before first effect/layout pass
   const [hydrated, setHydrated] = useState(false);
 
+  // One-time normalization to ensure every user has dateAdded (self-heals older data)
+  useEffect(() => {
+    if (!Array.isArray(users) || users.length === 0) return;
+    const needsPatch = users.some(u => !u?.dateAdded);
+    if (!needsPatch) return;
+
+    const patched = users.map(u => {
+      if (u?.dateAdded) return u;
+
+      // Prefer createdAt if present; otherwise attempt to derive from numeric id (Date.now())
+      const guessDate = (() => {
+        try {
+          if (u?.createdAt) return new Date(u.createdAt);
+          const maybeMs = Number(String(u?.id ?? '').slice(0, 13));
+          if (!Number.isNaN(maybeMs) && maybeMs > 0) return new Date(maybeMs);
+        } catch (_) {}
+        return new Date();
+      })();
+
+      return {
+        ...u,
+        dateAdded: guessDate.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })
+      };
+    });
+
+    setUsers(patched);
+    localStorage.setItem('users', JSON.stringify(patched));
+  }, [users]);
+
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
@@ -84,7 +113,7 @@ const UserManagement = () => {
       department: role === 'Student' ? form.department.value : '',
       studentId: role === 'Student' ? form.studentId.value : '',
       adminRole: role === 'Admin' ? form.adminRole.value : '',
-      dateAdded: new Date().toLocaleDateString()
+      dateAdded: new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })
     };
 
     const updatedUsers = [...users, newUser];
@@ -115,7 +144,9 @@ const UserManagement = () => {
       department: role === 'Student' ? form.department.value : '',
       studentId: role === 'Student' ? form.studentId.value : '',
       adminRole: role === 'Admin' ? form.adminRole.value : '',
-      dateAdded: editUser.dateAdded || new Date().toLocaleDateString()
+      dateAdded:
+        editUser.dateAdded ||
+        new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })
     };
 
     const updatedUsers = users.map((u) => (u.id === updatedUser.id ? updatedUser : u));
@@ -217,7 +248,12 @@ const UserManagement = () => {
                         ? `${u.department || ''}, ID: ${u.studentId || ''}`
                         : u.adminRole || ''}
                     </td>
-                    <td className="p-4 text-center">{u.dateAdded}</td>
+                    <td className="p-4 text-center">
+                      {u.dateAdded ||
+                        (u.createdAt
+                          ? new Date(u.createdAt).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })
+                          : '—')}
+                    </td>
                     <td className="p-4 flex gap-3 justify-center">
                       <button
                         onClick={() => handleEditUser(u)}
