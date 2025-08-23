@@ -21,18 +21,18 @@ const LoginSelection = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-purple-50 to-blue-100 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+      <div className="bg-white p-10 rounded-lg shadow-lg text-center">
         <h2 className="text-2xl font-semibold text-indigo-800 mb-4">Please Log In</h2>
-        <p className="text-gray-600 mb-6">Select your role to proceed:</p>
+        <p className="text-gray-600 text-lg mb-6">Select your role to proceed:</p>
         <button
           onClick={handleStudentLogin}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 mr-2"
+          className="bg-indigo-600 mb-2 text-lg text-white px-4 py-2 rounded-lg hover:bg-indigo-700 mr-2"
         >
           Login as Student
         </button>
         <button
           onClick={handleAdminLogin}
-          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+          className="bg-purple-600 text-lg text-white px-4 py-2 rounded-lg hover:bg-purple-700"
         >
           Login as Admin
         </button>
@@ -139,13 +139,13 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-purple-50 to-blue-100 font-inter text-gray-800 relative">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-purple-50 to-blue-100 font-inter text-gray-800 relative">
       <Navbar onSidebarToggle={handleSidebarToggle} />
 
       <div
         ref={sidebarRef}
-        className={`fixed z-40 w-64 bg-gradient-to-b from-indigo-800 to-purple-500 text-white rounded-md transition-all duration-300 ${isSidebarOpen ? 'left-0' : '-left-full'} md:left-0`}
-        style={{ top: '5rem', height: 'calc(100vh - 100px)' }}
+        className={`fixed z-40 w-64 bg-gradient-to-b from-indigo-800 to-purple-500 text-white rounded-md transition-all duration-300 overflow-y-auto ${isSidebarOpen ? 'left-0' : '-left-full'} md:left-0`} // Added overflow-y-auto for scrollable sidebar
+        style={{ top: '5rem', height: 'calc(100vh - 5rem)' }} // Adjusted height to fit screen
       >
         <div className="h-full p-4 flex flex-col justify-between items-center">
           <div className="w-full mt-8">
@@ -212,6 +212,8 @@ const Dashboard = () => {
                   <Link to="/user-management" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><Users className="w-5 h-5 mr-2" /> User Management</Link>
                   <hr className="border-t border-gray-500 my-1" />
                   <Link to="/reports" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><BarChart2 className="w-5 h-5 mr-2" /> Reports</Link>
+                  <hr className="border-t border-gray-500 my-1" />
+                  <Link to="/profile" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><User className="w-5 h-5 mr-2" /> Profile</Link>
                   <hr className="border-t border-gray-500 my-1" />
                   <Link to="/settings" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><Settings className="w-5 h-5 mr-2" /> Settings</Link>
                   <hr className="border-t border-gray-500 my-1" />

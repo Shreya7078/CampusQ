@@ -19,7 +19,7 @@ const SubmitQuery = () => {
       const file = files[0];
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, [name]: reader.result }); 
+        setFormData({ ...formData, [name]: reader.result });
       };
       reader.readAsDataURL(file);
     } else {
@@ -27,31 +27,71 @@ const SubmitQuery = () => {
     }
   };
 
+  // Write an admin notification into localStorage
+  const addAdminNotification = (message) => {
+    const saved = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+    const now = new Date();
+    const newNotif = { id: Date.now(), message, timestamp: now.toISOString() };
+    const updated = [...saved, newNotif];
+    localStorage.setItem('adminNotifications', JSON.stringify(updated));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const studentDetails = JSON.parse(localStorage.getItem('studentDetails') || '{}');
+    const studentId = studentDetails.studentId || 'S001';
+
     const newQuery = {
-      id: Date.now(), 
-      ...formData,
+      id: Date.now(),
+      category: formData.category,
+      title: formData.title,
+      description: formData.description,
+      priority: formData.priority,
       date: new Date().toISOString().split('T')[0],
       status: 'Pending',
-      attachment: formData.attachment, 
+      studentId,
+      attachment: formData.attachment,
     };
+
+    // 1) Persist to localStorage
+    const savedQueries = JSON.parse(localStorage.getItem('queries') || '[]');
+    const updatedQueries = [...savedQueries, newQuery];
+    localStorage.setItem('queries', JSON.stringify(updatedQueries));
+
+    // 2) Update context
     dispatch({ type: 'ADD_QUERY', payload: newQuery });
-    navigate('/student-dashboard');
+
+    // 3) Add admin notification
+    addAdminNotification(
+      `Student ${studentId} raised a query "${newQuery.title}" (ID: ${newQuery.id}) on ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`
+    );
+
+    // 4) Navigate after microtask to ensure writes are flushed
+    Promise.resolve().then(() => navigate('/student-dashboard'));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center p-6" style={{ backdropFilter: 'blur(5px)' }}>
+    <div
+      className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center p-6"
+      style={{ backdropFilter: 'blur(5px)' }}
+    >
       <div className="bg-white/30 backdrop-blur-md p-8 rounded-xl shadow-2xl border border-white/20 max-w-md w-full transform transition-all duration-300 hover:shadow-indigo-300/50 mt-20">
-        <h2 className="text-3xl font-montserrat font-bold mb-6 text-transparent bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-center">Submit New Query</h2>
+        <h2 className="text-3xl font-montserrat font-bold mb-6 text-transparent bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-center">
+          Submit New Query
+        </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-800 mb-2 font-poppins font-semibold"><strong>Category:</strong></label>
+            <label className="block text-gray-800 mb-2 font-poppins font-semibold">
+              <strong>Category:</strong>
+            </label>
             <select
               name="category"
               value={formData.category}
               onChange={handleChange}
               className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
             >
               <option value="">Select Category</option>
               <option value="Library">Library</option>
@@ -60,53 +100,65 @@ const SubmitQuery = () => {
               <option value="Mess">Mess</option>
               <option value="Transport">Transport</option>
               <option value="Other">Other</option>
-              
             </select>
           </div>
+
           <div>
-            <label className="block text-gray-800 mb-2 font-poppins font-semibold"><strong>Title:</strong></label>
+            <label className="block text-gray-800 mb-2 font-poppins font-semibold">
+              <strong>Title:</strong>
+            </label>
             <input
               type="text"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter  focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Enter title"
               required
             />
           </div>
+
           <div>
-            <label className="block text-gray-800 mb-2 font-poppins font-semibold"><strong>Description:</strong></label>
+            <label className="block text-gray-800 mb-2 font-poppins font-semibold">
+              <strong>Description:</strong>
+            </label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter  focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
               rows={4}
               placeholder="Enter description"
               required
             />
           </div>
+
           <div>
-            <label className="block text-gray-800 mb-2 font-poppins font-semibold"><strong>Priority:</strong></label>
+            <label className="block text-gray-800 mb-2 font-poppins font-semibold">
+              <strong>Priority:</strong>
+            </label>
             <select
               name="priority"
               value={formData.priority}
               onChange={handleChange}
-              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter  focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
             >
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
               <option value="High">High</option>
             </select>
           </div>
+
           <div>
-            <label className="block text-gray-800 mb-2 font-poppins font-semibold"><strong>Attachment:</strong></label>
+            <label className="block text-gray-800 mb-2 font-poppins font-semibold">
+              <strong>Attachment:</strong>
+            </label>
             <input
               type="file"
               name="attachment"
               onChange={handleChange}
-              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter  focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             {formData.attachment && (
               <div className="mt-2">
@@ -119,6 +171,7 @@ const SubmitQuery = () => {
               </div>
             )}
           </div>
+
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-indigo-600 to-pink-500 text-white py-2 rounded-lg hover:from-indigo-700 hover:to-pink-600 transition-all duration-300 font-poppins font-bold"

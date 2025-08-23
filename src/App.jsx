@@ -9,7 +9,11 @@ import SubmitQuery from './pages/SubmitQuery';
 import { QueryProvider } from './context/QueryContext';
 import QueryDetail from './pages/QueryDetail';
 import NotFound from './pages/NotFound';
-// import SupportPage from './pages/SupportPage';
+import ContactPage from './pages/ContactPage';
+import AnnouncementsPage from './pages/AnnouncementsPage';
+import Profile from './pages/ProfilePage';
+import ManageQueries from './pages/ManageQueries';
+import UserManagement from './pages/UserManagement';
 
 function App() {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -33,11 +37,15 @@ function App() {
               path="/admin-dashboard"
               element={isAuthenticated && userRole === 'admin' ? <Dashboard /> : <Navigate to="/dashboard" replace />}
             />
-            {/* <Route path="/support" element={<SupportPage />} /> */}
+            <Route path="/support" element={<ContactPage />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/submit-query" element={<SubmitQuery />} />
             <Route path="/query/:id" element={<QueryDetail />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/announcements" element={<AnnouncementsPage/>} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/manage-queries" element={<ManageQueries />} />
+            <Route path="/user-management" element={<UserManagement />} />
           </Routes>
           {/* <Footer /> */}
         </BrowserRouter>
