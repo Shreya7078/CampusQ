@@ -14,6 +14,7 @@ import AnnouncementsPage from './pages/AnnouncementsPage';
 import Profile from './pages/ProfilePage';
 import ManageQueries from './pages/ManageQueries';
 import UserManagement from './pages/UserManagement';
+import Reports from './pages/Reports';
 
 function App() {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -46,6 +47,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/manage-queries" element={<ManageQueries />} />
             <Route path="/user-management" element={<UserManagement />} />
+            <Route path="/reports" element={<Reports />}/>
           </Routes>
           {/* <Footer /> */}
         </BrowserRouter>
