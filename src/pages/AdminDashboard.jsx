@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AlertTriangle, Users, BarChart2, User, Search, Plus, Bell } from 'lucide-react';
@@ -57,9 +59,9 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (notifications.length > lastNotifCount) {
-      // dot will show automatically via hasNew
+      // dot via hasNew
     } else if (notifications.length < lastNotifCount) {
-      // dot will show automatically via hasNew
+      // dot via hasNew
     }
   }, [notifications, lastNotifCount]);
 
@@ -71,8 +73,8 @@ const AdminDashboard = () => {
 
   const scrollToNotifications = () => {
     markNotifsSeen();
-    localStorage.setItem('lastSeenAdminNotifCount', notifications.length); // Save count
-    setLastNotifCount(notifications.length); // Update state
+    localStorage.setItem('lastSeenAdminNotifCount', notifications.length);
+    setLastNotifCount(notifications.length);
     setTimeout(() => {
       if (notificationsRef.current) {
         notificationsRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -128,24 +130,29 @@ const AdminDashboard = () => {
         type: 'bar',
         data: {
           labels: ['Pending', 'In Progress', 'Resolved'],
-          datasets: savedQueries.length > 0
-            ? [{
-                label: 'Query Status',
-                data: [
-                  savedQueries.filter((q) => q.status === 'Pending').length,
-                  savedQueries.filter((q) => q.status === 'In Progress').length,
-                  savedQueries.filter((q) => q.status === 'Resolved').length
+          datasets:
+            savedQueries.length > 0
+              ? [
+                  {
+                    label: 'Query Status',
+                    data: [
+                      savedQueries.filter((q) => q.status === 'Pending').length,
+                      savedQueries.filter((q) => q.status === 'In Progress').length,
+                      savedQueries.filter((q) => q.status === 'Resolved').length,
+                    ],
+                    backgroundColor: ['#4B5EAA', '#A3BFFA', '#81C784'],
+                    borderColor: ['#2A4066', '#6B91D7', '#4CAF50'],
+                    borderWidth: 1,
+                  },
+                ]
+              : [
+                  {
+                    label: '',
+                    data: [0,0,0],
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    borderColor: 'rgba(0,0,0,0)',
+                  },
                 ],
-                backgroundColor: ['#4B5EAA', '#A3BFFA', '#81C784'],
-                borderColor: ['#2A4066', '#6B91D7', '#4CAF50'],
-                borderWidth: 1
-              }]
-            : [{
-                label: '',
-                data: [0, 0, 0],
-                backgroundColor: 'rgba(0,0,0,0)',
-                borderColor: 'rgba(0,0,0,0)'
-              }]
         },
         options: {
           responsive: true,
@@ -153,24 +160,25 @@ const AdminDashboard = () => {
           animation: false,
           plugins: {
             legend: { position: 'top', display: savedQueries.length > 0 },
-            title: { display: true, text: 'Query Status Overview' }
+            title: { display: true, text: 'Query Status Overview' },
           },
           scales: {
             x: { display: true },
-            y: { display: true, beginAtZero: true, ticks: { stepSize: 1 } }
-          }
-        }
+            y: { display: true, beginAtZero: true, ticks: { stepSize: 1 } },
+          },
+        },
       });
     }
 
+    // Entrance animation (same feel as student)
     const ctxAnimation = gsap.context(() => {
       if (!contentRef.current) return;
       gsap.from(contentRef.current.children, {
-        duration: 1.5,
+        duration: 1,
         y: 50,
         opacity: 0,
-        stagger: 0.3,
-        ease: 'power3.out'
+        stagger: 0.2,
+        ease: 'power2.out',
       });
     });
 
@@ -287,7 +295,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" ref={contentRef}>
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-700 to-pink-500">
           Welcome, Admin!
@@ -299,13 +307,12 @@ const AdminDashboard = () => {
         >
           <Bell className="w-5 h-5 text-indigo-600 mr-2" />
           <span className="font-semibold text-indigo-700 hidden sm:inline">Notifications</span>
-          {hasNew && (
-            <span className="ml-2 inline-block w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
-          )}
+          {hasNew && <span className="ml-2 inline-block w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />}
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Manage Queries */}
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-indigo-400/40 transition-all duration-300 border border-indigo-100 lg:col-span-3">
           <h3 className="text-xl font-semibold mb-5 text-indigo-700 flex items-center">
             <AlertTriangle className="w-6 h-6 mr-3" /> Manage Queries
@@ -356,27 +363,29 @@ const AdminDashboard = () => {
           </Link>
         </div>
 
+        {/* Reports */}
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-green-400/40 transition-all duration-300 border border-green-100">
           <h3 className="text-xl font-semibold mb-5 text-indigo-700 flex items-center">
             <BarChart2 className="w-6 h-6 mr-3" /> Reports
           </h3>
-          <div className="h-64" style={{ position: 'relative' }}>
+          <div className="h-72" style={{ position: 'relative' }}>
             <canvas
               ref={chartRef}
               id="queryChart"
               style={{ maxHeight: '100%', maxWidth: '100%', position: 'absolute', top: 0, left: 0 }}
             />
           </div>
-          <div className="mt-5 text-center">
+          <div className="mt-10 text-center">
             <Link
               to="/reports"
-              className="w-full inline-block bg-gradient-to-r from-green-800 to-emerald-500 text-white px-6 py-2 rounded-lg shadow-md hover:from-green-700 hover:to-emerald-400 hover:shadow-lg transition-all duration-200"
+              className="w-full inline-block bg-gradient-to-r from-green-800  to-emerald-500 text-white px-6 py-2 rounded-lg shadow-md hover:from-green-700 hover:to-emerald-400 hover:shadow-lg transition-all duration-200"
             >
               View Detailed Reports
             </Link>
           </div>
         </div>
 
+        {/* User Management */}
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-purple-400/40 transition-all duration-300 border border-purple-100 lg:col-span-2">
           <h3 className="text-xl font-semibold mb-5 text-indigo-700 flex items-center">
             <Users className="w-6 h-6 mr-3" /> User Management
@@ -407,7 +416,9 @@ const AdminDashboard = () => {
               <div
                 key={user.id}
                 className={`p-4 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border ${
-                  user.role === 'Student' ? 'bg-gradient-to-br from-green-50 to-white border-green-200 hover:border-green-300' : 'bg-gradient-to-br from-purple-50 to-white border-purple-200 hover:border-purple-300'
+                  user.role === 'Student'
+                    ? 'bg-gradient-to-br from-green-50 to-white border-green-200 hover:border-green-300'
+                    : 'bg-gradient-to-br from-purple-50 to-white border-purple-200 hover:border-purple-300'
                 }`}
               >
                 <User className="w-12 h-12 mx-auto mb-3" style={{ color: user.role === 'Student' ? '#4CAF50' : '#6B46C1' }} />
@@ -443,13 +454,24 @@ const AdminDashboard = () => {
           </Link>
         </div>
 
+        {/* Notifications with top-right View all */}
         <div
           ref={notificationsRef}
           className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-yellow-400/40 transition-all duration-300 border border-yellow-100 lg:col-span-3"
         >
-          <h3 className="text-xl font-semibold mb-5 text-indigo-700 flex items-center">
-            <Bell className="w-6 h-6 mr-3" /> Notifications
-          </h3>
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-xl font-semibold text-indigo-700 flex items-center">
+              <Bell className="w-6 h-6 mr-3" /> Notifications
+            </h3>
+            <Link
+              to="/notifications-page"
+              className="inline-flex items-center px-4 py-2 rounded-lg shadow-md bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-700 hover:to-indigo-600 text-white text-md font-medium hover:shadow-lg transition-all duration-200"
+              aria-label="View all notifications"
+            >
+              View all
+            </Link>
+          </div>
+
           <div className="overflow-x-auto max-h-48 overflow-y-auto bg-gray-50 p-4 rounded-lg">
             {notifications.length > 0 ? (
               <ul className="list-disc pl-5">
@@ -458,7 +480,8 @@ const AdminDashboard = () => {
                   .slice(0, 5)
                   .map((notif) => (
                     <li key={notif.id} className="text-gray-700 mb-3">
-                      {notif.message} (Time: {new Date(notif.timestamp).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })})
+                      {notif.message} (Time:{' '}
+                      {new Date(notif.timestamp).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })})
                     </li>
                   ))}
               </ul>

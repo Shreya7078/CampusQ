@@ -51,7 +51,7 @@ const ContactPage = () => {
         </div>
       )}
 
-      {/* Hero Section */}
+     
       <header className="pt-32 md:pt-36 pb-16 md:pb-20 text-center relative bg-gradient-to-br from-purple-200 via-blue-50 to-white">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-6xl md:text-6xl font-bold animate-fadeIn bg-gradient-to-r from-indigo-600 to-pink-500 text-transparent tracking-wide bg-clip-text">
@@ -63,10 +63,10 @@ const ContactPage = () => {
         </div>
       </header>
 
-      {/* Main Content */}
+      
       <main className="px-4  md:px-8 max-w-5xl mx-auto py-8 md:py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-          {/* Contact Form */}
+         
           <div className="bg-white p-5 md:p-6 rounded-xl shadow-2xl hover:shadow-xl transition-shadow duration-300 border border-gray-100">
             <h2 className="text-2xl md:text-3xl font-poppins font-semibold text-indigo-800 mb-6">Contact Us</h2>
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -102,7 +102,7 @@ const ContactPage = () => {
             </form>
           </div>
 
-          {/* Contact Details */}
+         
           <div className="space-y-8">
             <div className="bg-white p-6 md:p-8 rounded-xl shadow-2xl hover:shadow-xl transition-shadow duration-300 border border-gray-100">
               <h2 className="text-2xl md:text-3xl font-bold text-indigo-800 mb-5">Contact Details</h2>
@@ -125,7 +125,6 @@ const ContactPage = () => {
         </div>
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

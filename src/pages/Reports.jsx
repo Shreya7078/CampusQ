@@ -8,7 +8,7 @@ const Reports = () => {
   const [allQueries, setAllQueries] = useState(() => JSON.parse(localStorage.getItem('queries') || '[]'));
   const [loading, setLoading] = useState(false);
 
-  // Filters
+
   const [statusFilter, setStatusFilter] = useState('All'); // All | Pending | In Progress | Resolved
   const [categoryFilter, setCategoryFilter] = useState('All Categories'); // IMPORTANT
   const [fromDate, setFromDate] = useState('');
@@ -18,7 +18,7 @@ const Reports = () => {
   const chartInstance = useRef(null);
   const pageRef = useRef(null);
 
-  // Sync with localStorage
+ 
   useEffect(() => {
     const onStorage = (e) => {
       if (e.key === 'queries') setAllQueries(JSON.parse(e.newValue || '[]'));
@@ -34,7 +34,7 @@ const Reports = () => {
     };
   }, []);
 
-  // Entry animation
+
   useEffect(() => {
     if (!pageRef.current) return;
     gsap.fromTo(
@@ -44,7 +44,7 @@ const Reports = () => {
     );
   }, []);
 
-  // Helpers
+
   const parseDate = (d) => {
     if (!d) return null;
     const t = new Date(d);
@@ -52,7 +52,7 @@ const Reports = () => {
   };
   const dayDiff = (a, b) => (b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24);
 
-  // Normalize base dates
+  
   const normalized = useMemo(() => {
     const arr = Array.isArray(allQueries) ? allQueries : [];
     return arr.map((q) => {
@@ -64,7 +64,6 @@ const Reports = () => {
     });
   }, [allQueries]);
 
-  // Normalize category once: blank -> 'Others'
   const normalizedWithCat = useMemo(() => {
     return normalized.map(q => ({
       ...q,
@@ -72,7 +71,7 @@ const Reports = () => {
     }));
   }, [normalized]);
 
-  // Category options: predefined + extras from data
+ 
   const categories = useMemo(() => {
     const base = ['All Categories', 'Hostel', 'Mess', 'Transport', 'Library', 'Network', 'Others'];
     const dyn = new Set();
@@ -81,32 +80,32 @@ const Reports = () => {
     return [...base, ...extra];
   }, [normalizedWithCat]);
 
-  // Apply filters (use _cat consistently with proper date range inclusion)
+
   const filtered = useMemo(() => {
     const from = fromDate ? new Date(fromDate) : null;
     const to = toDate ? new Date(toDate) : null;
     console.log('Applying filters - Status:', statusFilter, 'Category:', categoryFilter, 'From:', from, 'To:', to); // Debug log
 
-    // Check for invalid date range
+
     if (from && to && from > to) {
       console.log('Invalid date range: From date is after To date, returning empty array');
       return [];
     }
 
     return normalizedWithCat.filter((q) => {
-      // Status filter
+     
       if (statusFilter !== 'All' && q.status !== statusFilter) {
         console.log(`Excluded by status: ${q.title}, Status: ${q.status}`);
         return false;
       }
 
-      // Category filter
+  
       if (categoryFilter !== 'All Categories' && q._cat !== categoryFilter) {
         console.log(`Excluded by category: ${q.title}, Category: ${q._cat}`);
         return false;
       }
 
-      // Date range filter (exclusive of to date)
+   
       if (from && q._created) {
         if (q._created < from || (to && q._created > to)) {
           console.log(`Excluded by date: ${q.title}, Created: ${q._created}, From: ${from}, To: ${to}`);
@@ -119,13 +118,13 @@ const Reports = () => {
     });
   }, [normalizedWithCat, statusFilter, categoryFilter, fromDate, toDate]);
 
-  // KPIs based on filtered set (intentional)
+  
   const pendingCount = filtered.filter((q) => q.status === 'Pending').length;
   const inProgressCount = filtered.filter((q) => q.status === 'In Progress').length;
   const resolvedCount = filtered.filter((q) => q.status === 'Resolved').length;
   const totalCount = filtered.length;
 
-  // SLA
+  
   const now = new Date();
   const overduePending = filtered.filter(
     (q) => q.status === 'Pending' && q._created && Math.floor(dayDiff(q._created, now)) > 3
@@ -139,7 +138,7 @@ const Reports = () => {
     ? resolvedDurations.reduce((a, b) => a + b, 0) / resolvedDurations.length
     : 0;
 
-  // Category breakdown (use _cat)
+  
   const categoryBreakdown = useMemo(() => {
     const map = new Map();
     filtered.forEach((q) => {
@@ -155,7 +154,7 @@ const Reports = () => {
     return rows;
   }, [filtered]);
 
-  // Chart: rebuild safely after layout
+
   useEffect(() => {
     const ctx = chartRef.current ? chartRef.current.getContext('2d') : null;
     if (!ctx) return;
@@ -201,7 +200,7 @@ const Reports = () => {
     };
   }, [pendingCount, inProgressCount, resolvedCount]);
 
-  // Refresh (now includes reset logic)
+ 
   const handleRefresh = () => {
     setLoading(true);
     const fresh = JSON.parse(localStorage.getItem('queries') || '[]');
@@ -221,19 +220,19 @@ const Reports = () => {
 
   return (
     <div className="min-h-screen bg-white pt-24">
-      {/* Centered heading bar */}
+      
       <div className="top-[4rem] bg-white">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-2">
-          <h1 className="text-6xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-pink-500 py-1">
+          <h1 className="text-6xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-pink-500 py-1">
             Reports & Analytics
           </h1>
         </div>
         <div className=" border-indigo-100" />
       </div>
 
-      {/* Main content */}
+     
       <div ref={pageRef} className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-6">
-        {/* Filters */}
+       
         <div data-fade-in className="bg-white p-4 rounded-2xl shadow-lg border border-indigo-100 mb-6">
           <div className="flex flex-col lg:flex-row gap-4 items-center">
             <div className="flex items-center gap-2 w-full lg:w-auto">
@@ -265,6 +264,7 @@ const Reports = () => {
 
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-indigo-600" />
+                <label className="text-sm font-medium text-gray-700">From</label>
                 <input
                   type="date"
                   value={fromDate}
@@ -275,6 +275,7 @@ const Reports = () => {
 
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-indigo-600" />
+                <label className="text-sm font-medium text-gray-700">To</label>
                 <input
                   type="date"
                   value={toDate}
@@ -299,7 +300,7 @@ const Reports = () => {
           )}
         </div>
 
-        {/* KPIs */}
+      
         <div data-fade-in className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <div className="bg-white p-5 rounded-2xl shadow-lg border border-yellow-100">
             <div className="flex items-center justify-between">
@@ -331,7 +332,7 @@ const Reports = () => {
           </div>
         </div>
 
-        {/* Chart + SLA */}
+        
         <div data-fade-in className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-green-100 lg:col-span-2">
             <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center">
@@ -359,7 +360,7 @@ const Reports = () => {
           </div>
         </div>
 
-        {/* Category breakdown */}
+      
         <div data-fade-in className="bg-white p-6 rounded-2xl shadow-lg border border-purple-100 mb-6">
           <h3 className="text-lg font-semibold mb-4 text-indigo-700">Category Breakdown</h3>
           {categoryBreakdown.length === 0 ? (
@@ -395,7 +396,7 @@ const Reports = () => {
           )}
         </div>
 
-        {/* Query list */}
+    
         <div data-fade-in className="bg-white p-6 rounded-2xl shadow-lg border border-indigo-100">
           <h3 className="text-lg font-semibold mb-4 text-indigo-700">Queries (Filtered)</h3>
           {filtered.length === 0 ? (

@@ -13,13 +13,13 @@ const UserManagement = () => {
   const [selectedRole, setSelectedRole] = useState('Student');
   const modalRef = useRef(null);
 
-  // Hydrate users synchronously from localStorage (prevents empty first paint)
+
   const [users, setUsers] = useState(() => JSON.parse(localStorage.getItem('users') || '[]'));
 
-  // Hydration flag to avoid rendering the table body before first effect/layout pass
+  
   const [hydrated, setHydrated] = useState(false);
 
-  // One-time normalization to ensure every user has dateAdded (self-heals older data)
+ 
   useEffect(() => {
     if (!Array.isArray(users) || users.length === 0) return;
     const needsPatch = users.some(u => !u?.dateAdded);
@@ -28,7 +28,7 @@ const UserManagement = () => {
     const patched = users.map(u => {
       if (u?.dateAdded) return u;
 
-      // Prefer createdAt if present; otherwise attempt to derive from numeric id (Date.now())
+    
       const guessDate = (() => {
         try {
           if (u?.createdAt) return new Date(u.createdAt);
@@ -51,7 +51,7 @@ const UserManagement = () => {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    // Animate page title
+ 
     gsap.fromTo(
       '.page-title',
       { y: 30, opacity: 0, scale: 0.8 },
@@ -70,7 +70,6 @@ const UserManagement = () => {
       }
     );
 
-    // Row animation: avoid opacity flicker, run next frame
     const cards = document.querySelectorAll('.user-card');
     if (cards.length > 0) {
       requestAnimationFrame(() => {
@@ -90,7 +89,7 @@ const UserManagement = () => {
       });
     }
 
-    // Mark as hydrated so we render table rows after first layout
+ 
     setHydrated(true);
 
     return () => {
@@ -99,7 +98,7 @@ const UserManagement = () => {
     };
   }, []);
 
-  // Add new user
+  
   const handleAddUser = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -123,14 +122,14 @@ const UserManagement = () => {
     setShowForm(false);
   };
 
-  // Edit user
+
   const handleEditUser = (user) => {
     setEditUser(user);
     setSelectedRole(user.role);
     setShowForm(true);
   };
 
-  // Save user changes
+  
   const handleSaveUser = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -156,14 +155,14 @@ const UserManagement = () => {
     setShowForm(false);
   };
 
-  // Delete user
+
   const handleDeleteUser = (id) => {
     const updatedUsers = users.filter((u) => u.id !== id);
     setUsers(updatedUsers);
     localStorage.setItem('users', JSON.stringify(updatedUsers));
   };
 
-  // Search filter (memoized to reduce re-renders during typing)
+  
   const filteredUsers = useMemo(() => {
     const term = searchTerm.toLowerCase();
     return users.filter(
@@ -187,7 +186,7 @@ const UserManagement = () => {
           User Management
         </h2>
 
-        {/* Search + Add Button */}
+        
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
           <div className="relative w-full sm:w-96">
             <input
@@ -283,7 +282,6 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* Add / Edit Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <div

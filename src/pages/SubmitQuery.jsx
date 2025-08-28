@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '../context/QueryContext';
@@ -16,18 +17,17 @@ const SubmitQuery = () => {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'attachment' && files) {
-      const file = files[0];
+      const file = files;
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, [name]: reader.result });
+        setFormData((prev) => ({ ...prev, [name]: reader.result }));
       };
       reader.readAsDataURL(file);
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  // Write an admin notification into localStorage
   const addAdminNotification = (message) => {
     const saved = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
     const now = new Date();
@@ -48,62 +48,68 @@ const SubmitQuery = () => {
       title: formData.title,
       description: formData.description,
       priority: formData.priority,
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split('T'),
       status: 'Pending',
       studentId,
       attachment: formData.attachment,
     };
 
-    // 1) Persist to localStorage
+    
     const savedQueries = JSON.parse(localStorage.getItem('queries') || '[]');
     const updatedQueries = [...savedQueries, newQuery];
     localStorage.setItem('queries', JSON.stringify(updatedQueries));
 
-    // 2) Update context
+    
     dispatch({ type: 'ADD_QUERY', payload: newQuery });
 
-    // 3) Add admin notification
+    
     addAdminNotification(
       `Student ${studentId} raised a query "${newQuery.title}" (ID: ${newQuery.id}) on ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`
     );
 
-    // 4) Navigate after microtask to ensure writes are flushed
+    
     Promise.resolve().then(() => navigate('/student-dashboard'));
   };
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center p-6"
+      className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center p-4 sm:p-6"
       style={{ backdropFilter: 'blur(5px)' }}
     >
-      <div className="bg-white/30 backdrop-blur-md p-8 rounded-xl shadow-2xl border border-white/20 max-w-md w-full transform transition-all duration-300 hover:shadow-indigo-300/50 mt-20">
-        <h2 className="text-3xl font-montserrat font-bold mb-6 text-transparent bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-center">
+  
+      <div className="bg-white/30 backdrop-blur-md p-6 sm:p-8 rounded-xl shadow-2xl border border-white/20 w-full max-w-sm sm:max-w-md transform transition-all duration-300 hover:shadow-indigo-300/50 mt-16 sm:mt-20">
+        <h2 className="text-2xl sm:text-3xl font-montserrat font-bold mb-6 text-transparent bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-center">
           Submit New Query
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+          {/* Category */}
+          <div className="w-full max-w-full">
             <label className="block text-gray-800 mb-2 font-poppins font-semibold">
               <strong>Category:</strong>
             </label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            >
-              <option value="">Select Category</option>
-              <option value="Library">Library</option>
-              <option value="Network">Network</option>
-              <option value="Hostel">Hostel</option>
-              <option value="Mess">Mess</option>
-              <option value="Transport">Transport</option>
-              <option value="Other">Other</option>
-            </select>
+            <div className="relative w-full">
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full max-w-full  min-w-0 h-11 px-3 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none"
+                required
+              >
+                <option  value="">Select Category</option>
+                <option value="Library">Library</option>
+                <option value="Network">Network</option>
+                <option value="Hostel">Hostel</option>
+                <option value="Mess">Mess</option>
+                <option value="Transport">Transport</option>
+                <option value="Other">Other</option>
+              </select>
+              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">▾</span>
+            </div>
           </div>
 
-          <div>
+          {/* Title */} 
+          <div className="w-full">
             <label className="block text-gray-800 mb-2 font-poppins font-semibold">
               <strong>Title:</strong>
             </label>
@@ -112,13 +118,14 @@ const SubmitQuery = () => {
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full max-w-full min-w-0 h-11 px-3 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Enter title"
               required
             />
           </div>
 
-          <div>
+          {/* Description */}
+          <div className="w-full">
             <label className="block text-gray-800 mb-2 font-poppins font-semibold">
               <strong>Description:</strong>
             </label>
@@ -126,14 +133,15 @@ const SubmitQuery = () => {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full max-w-full min-w-0 px-3 py-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500 break-words"
               rows={4}
               placeholder="Enter description"
               required
             />
           </div>
 
-          <div>
+          {/* Priority */}
+          <div className="w-full max-w-full">
             <label className="block text-gray-800 mb-2 font-poppins font-semibold">
               <strong>Priority:</strong>
             </label>
@@ -141,7 +149,7 @@ const SubmitQuery = () => {
               name="priority"
               value={formData.priority}
               onChange={handleChange}
-              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full max-w-full min-w-0 h-11 px-3 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             >
               <option value="Low">Low</option>
@@ -150,7 +158,8 @@ const SubmitQuery = () => {
             </select>
           </div>
 
-          <div>
+          {/* Attachment */}
+          <div className="w-full">
             <label className="block text-gray-800 mb-2 font-poppins font-semibold">
               <strong>Attachment:</strong>
             </label>
@@ -158,15 +167,21 @@ const SubmitQuery = () => {
               type="file"
               name="attachment"
               onChange={handleChange}
-              className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full max-w-full min-w-0 h-11 px-3 py-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 font-inter focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             {formData.attachment && (
               <div className="mt-2">
                 <p className="text-gray-600 font-poppins">Attachment Preview:</p>
                 {formData.attachment.startsWith('data:image') ? (
-                  <img src={formData.attachment} alt="Preview" className="mt-2 max-w-full h-auto rounded-lg" />
+                  <img
+                    src={formData.attachment}
+                    alt="Preview"
+                    className="mt-2 max-w-full h-auto rounded-lg"
+                  />
                 ) : (
-                  <p className="text-gray-600 font-poppins">Preview available only for images.</p>
+                  <p className="text-gray-600 font-poppins">
+                    Preview available only for images.
+                  </p>
                 )}
               </div>
             )}
@@ -174,7 +189,7 @@ const SubmitQuery = () => {
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-indigo-600 to-pink-500 text-white py-2 rounded-lg hover:from-indigo-700 hover:to-pink-600 transition-all duration-300 font-poppins font-bold"
+            className="w-full h-11 bg-gradient-to-r from-indigo-600 to-pink-500 text-white rounded-lg hover:from-indigo-700 hover:to-pink-600 transition-all duration-300 font-poppins font-bold"
           >
             Submit Query
           </button>
@@ -185,3 +200,4 @@ const SubmitQuery = () => {
 };
 
 export default SubmitQuery;
+

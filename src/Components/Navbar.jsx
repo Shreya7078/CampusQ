@@ -141,7 +141,7 @@ function Navbar({ onSidebarToggle }) {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-gradient-to-r from-indigo-900 to-purple-600 text-white p-4 absolute w-full mt-12 z-20">
+        <div className="md:hidden bg-gradient-to-r from-indigo-900 to-purple-600 text-white p-4 absolute w-full mt-16 z-20">
           <Link
             to="/"
             className={`block py-2 ${location.pathname === '/' ? 'border-b-2 border-white' : 'hover:bg-indigo-600'}`}

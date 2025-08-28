@@ -11,7 +11,7 @@ const QueryDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState({});
 
-  // Write an admin notification into localStorage
+
   const addAdminNotification = (message) => {
     const saved = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
     const now = new Date();
@@ -54,18 +54,18 @@ const QueryDetail = () => {
       return;
     }
 
-    // Update context
+    
     dispatch({
       type: 'UPDATE_QUERY',
       payload: { id: query.id, updatedData: editedData },
     });
 
-    // Persist to localStorage (keep parity)
+    
     const saved = JSON.parse(localStorage.getItem('queries') || '[]');
     const updated = saved.map((q) => (q.id === query.id ? { ...q, ...editedData } : q));
     localStorage.setItem('queries', JSON.stringify(updated));
 
-    // Update local component state
+    
     setQuery((prev) => (prev ? { ...prev, ...editedData } : prev));
     setIsEditing(false);
   };
@@ -74,18 +74,18 @@ const QueryDetail = () => {
     if (!query) return;
     if (!window.confirm('Are you sure you want to delete this query?')) return;
 
-    // Read current storage
+   
     const saved = JSON.parse(localStorage.getItem('queries') || '[]');
     const toDelete = saved.find((q) => String(q.id) === String(query.id));
 
-    // Remove in storage
+   
     const updated = saved.filter((q) => String(q.id) !== String(query.id));
     localStorage.setItem('queries', JSON.stringify(updated));
 
-    // Update context
+  
     dispatch({ type: 'DELETE_QUERY', payload: { id: query.id } });
 
-    // Notify admin
+    
     if (toDelete) {
       const studentDetails = JSON.parse(localStorage.getItem('studentDetails') || '{}');
       const studentId = toDelete.studentId || studentDetails.studentId || 'S001';
@@ -94,7 +94,7 @@ const QueryDetail = () => {
       );
     }
 
-    // Navigate back
+   
     navigate('/student-dashboard');
   };
 

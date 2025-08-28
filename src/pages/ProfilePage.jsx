@@ -9,6 +9,7 @@ import Footer from '../Components/Footer';
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { state: { queries, notifications }, dispatch } = useQuery();
+
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('isAuthenticated') === 'true');
   const [role, setRole] = useState(localStorage.getItem('userRole') || 'student');
 
@@ -27,11 +28,12 @@ const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedDetails, setEditedDetails] = useState(userDetails);
   const [adminNotifications, setAdminNotifications] = useState([]);
+
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const toastRef = useRef(null);
 
-  // Helper: add a single admin notification to localStorage and in-memory state (admin view)
+  
   const addAdminNotification = (message) => {
     const saved = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
     const now = new Date();
@@ -41,7 +43,7 @@ const ProfilePage = () => {
     setAdminNotifications(updated);
   };
 
-  // Initialize role-specific details
+  
   useEffect(() => {
     if (!isAuthenticated) return;
     setRole(localStorage.getItem('userRole') || 'student');
@@ -73,11 +75,10 @@ const ProfilePage = () => {
     }
   }, [isAuthenticated, role]);
 
-  // STUDENT: generate notifications when their queries get resolved (existing behavior retained)
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    const now = new Date(); // current time
+    const now = new Date();
     if (role === 'student') {
       const savedQueries = JSON.parse(localStorage.getItem('queries') || '[]');
       const studentNotifications = savedQueries
@@ -96,45 +97,36 @@ const ProfilePage = () => {
     }
   }, [isAuthenticated, role, userDetails.studentId, dispatch, notifications]);
 
-  // ADMIN: only send notifications when a query is raised or deleted
-  // We detect this by comparing current queries length vs last known queries length in localStorage
+  
   const lastQueryCountRef = useRef(null);
-
   useEffect(() => {
     if (!isAuthenticated || role !== 'admin') return;
 
-    // Load current admin notifications
     const savedAdminNotifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
     setAdminNotifications(savedAdminNotifications);
 
-    // Initialize lastQueryCountRef once
     if (lastQueryCountRef.current === null) {
       const savedQueries = JSON.parse(localStorage.getItem('queries') || '[]');
       lastQueryCountRef.current = savedQueries.length;
       return;
     }
 
-    // Compare previous length with current length to detect raise/delete
     const savedQueries = JSON.parse(localStorage.getItem('queries') || '[]');
     const prevCount = lastQueryCountRef.current;
     const currCount = savedQueries.length;
 
-    // Helper to find the delta item for message context
     const getDeltaItem = (prevList, currList, isAddition) => {
       const prevIds = new Set(prevList.map(q => q.id));
       const currIds = new Set(currList.map(q => q.id));
       if (isAddition) {
-        // New item exists in curr but not in prev
         const newId = [...currIds].find(id => !prevIds.has(id));
         return currList.find(q => q.id === newId) || null;
       }
-      // Deletion: item missing from curr
       const deletedId = [...prevIds].find(id => !currIds.has(id));
       return prevList.find(q => q.id === deletedId) || null;
     };
 
     if (currCount > prevCount) {
-      // Query raised (added)
       const prevList = JSON.parse(localStorage.getItem('lastQueriesSnapshot') || '[]');
       const delta = getDeltaItem(prevList, savedQueries, true);
       const title = delta?.title || 'New Query';
@@ -144,7 +136,6 @@ const ProfilePage = () => {
         `Student ${studentId} raised a query "${title}" (ID: ${qid}) on ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`
       );
     } else if (currCount < prevCount) {
-      // Query deleted (removed)
       const prevList = JSON.parse(localStorage.getItem('lastQueriesSnapshot') || '[]');
       const delta = getDeltaItem(prevList, savedQueries, false);
       const title = delta?.title || 'A query';
@@ -155,12 +146,11 @@ const ProfilePage = () => {
       );
     }
 
-    // Update last references
     lastQueryCountRef.current = currCount;
     localStorage.setItem('lastQueriesSnapshot', JSON.stringify(savedQueries));
-  }, [isAuthenticated, role, queries]); // reacts when queries in context change
+  }, [isAuthenticated, role, queries]);
 
-  // Entrance animations
+ 
   useEffect(() => {
     gsap.fromTo(
       '.profile-card, .main-card',
@@ -171,6 +161,7 @@ const ProfilePage = () => {
 
   const handleEdit = () => setIsEditing(true);
 
+  
   const handleSave = () => {
     setUserDetails(editedDetails);
     if (role === 'student') {
@@ -225,11 +216,26 @@ const ProfilePage = () => {
 
   const filteredNotifications = role === 'student'
     ? notifications.filter(n => n.studentId === userDetails.studentId)
-    : adminNotifications; 
+    : adminNotifications;
+
+  const latestThreeNotifications = useMemo(() => {
+    const list = Array.isArray(filteredNotifications) ? filteredNotifications : [];
+    return [...list]
+      .sort((a, b) => new Date(b?.timestamp || 0) - new Date(a?.timestamp || 0))
+      .slice(0, 3);
+  }, [filteredNotifications]);
+
+  const latestThreeManagedQueries = useMemo(() => {
+    if (role !== 'admin') return filteredQueries;
+    const list = Array.isArray(filteredQueries) ? filteredQueries : [];
+    return [...list]
+      .sort((a, b) => new Date(b?.date || 0) - new Date(a?.date || 0))
+      .slice(0, 3);
+  }, [filteredQueries, role]);
 
   return (
-    <div className="min-h-screen pt-10 flex flex-col bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 font-poppins text-gray-800">
-      {/* Toast Notification */}
+    <div className="min-h-screen pt-10 flex flex-col bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 font-poppins text-gray-800 mt-6">
+    
       {showToast && (
         <div
           ref={toastRef}
@@ -240,11 +246,11 @@ const ProfilePage = () => {
         </div>
       )}
 
-      {/* Main content */}
+     
       <div className="flex-grow max-w-7xl mx-auto py-12 px-4 md:px-8 grid md:grid-cols-3 gap-10">
-        {/* Left Profile Column */}
+      
         <div className="space-y-6">
-          {/* Profile Card */}
+          
           <div className="profile-card bg-white p-[1px] rounded-2xl shadow-xl">
             <div className="bg-white rounded-2xl p-6 flex flex-col items-center text-center">
               <div className="w-28 h-28 bg-gradient-to-br from-indigo-200 to-purple-200 rounded-full flex items-center justify-center shadow-md mb-4">
@@ -282,14 +288,14 @@ const ProfilePage = () => {
                 )}
                 {role === 'admin' && (
                   <p className="flex items-center">
-                    <span className="w-5 h-5 mr-2 text-indigo-600">👨💼</span> {editedDetails.adminRole}
+                    <span className="w-5 h-5 mr-2 text-indigo-600">👨</span> {editedDetails.adminRole}
                   </p>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Stats Block */}
+    
           <div className="bg-white p-[1px] rounded-2xl shadow-xl">
             <div className="bg-white rounded-2xl p-6">
               <h3 className="text-base font-semibold text-gray-700 mb-5">Your Stats</h3>
@@ -315,9 +321,8 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Right Main Details */}
         <div className="main-card md:col-span-2 space-y-10">
-          {/* Profile Info Card */}
+        
           <div className="bg-white rounded-2xl shadow-xl p-6">
             <h3 className="text-2xl font-semibold mb-6 text-indigo-700 border-b-2 border-indigo-200 pb-3">Profile Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -391,42 +396,86 @@ const ProfilePage = () => {
             )}
           </div>
 
-          {/* Queries & Notifications */}
+        
           <div className="grid md:grid-cols-2 gap-8">
+            
             <div className="bg-white rounded-2xl shadow-xl p-6">
-              <h3 className="text-2xl font-semibold mb-6 text-indigo-700 border-b-2 border-indigo-200 pb-3">
-                {role === 'student' ? 'Query History' : 'Managed Queries'}
-              </h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-semibold text-indigo-700 border-b-2 border-indigo-200 pb-3">
+                  {role === 'student' ? 'Query History' : 'Managed Queries'}
+                </h3>
+                {role === 'admin' && (
+                  <button
+                    onClick={() => navigate('/manage-queries')}
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-sm hover:bg-indigo-700 transition"
+                    title="View all queries"
+                  >
+                    View all
+                  </button>
+                )}
+              </div>
+
               <ul className="space-y-4">
-                {filteredQueries.length === 0 ? (
-                  <p className="text-gray-500">No queries found.</p>
+                {role === 'admin' ? (
+                  (latestThreeManagedQueries.length === 0 ? (
+                    <p className="text-gray-500">No queries found.</p>
+                  ) : (
+                    latestThreeManagedQueries.map((q) => (
+                      <li key={q.id} className="border p-4 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-all">
+                        <p className="font-semibold text-base">{q.title}</p>
+                        <p className="text-sm text-gray-500">{q.status}</p>
+                        <p className="text-xs text-gray-400">{q.date}</p>
+                        {q.attachment && (
+                          <img src={q.attachment} alt="Attachment" className="mt-2 max-w-full h-auto rounded-lg" />
+                        )}
+                      </li>
+                    ))
+                  ))
                 ) : (
-                  filteredQueries.map((q) => (
-                    <li key={q.id} className="border p-4 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-all">
-                      <p className="font-semibold text-base">{q.title}</p>
-                      <p className="text-sm text-gray-500">{q.status}</p>
-                      <p className="text-xs text-gray-400">{q.date}</p>
-                      {q.attachment && (
-                        <img src={q.attachment} alt="Attachment" className="mt-2 max-w-full h-auto rounded-lg" />
-                      )}
-                    </li>
+                  (filteredQueries.length === 0 ? (
+                    <p className="text-gray-500">No queries found.</p>
+                  ) : (
+                    filteredQueries.map((q) => (
+                      <li key={q.id} className="border p-4 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-all">
+                        <p className="font-semibold text-base">{q.title}</p>
+                        <p className="text-sm text-gray-500">{q.status}</p>
+                        <p className="text-xs text-gray-400">{q.date}</p>
+                        {q.attachment && (
+                          <img src={q.attachment} alt="Attachment" className="mt-2 max-w-full h-auto rounded-lg" />
+                        )}
+                      </li>
+                    ))
                   ))
                 )}
               </ul>
             </div>
+
+      
             <div className="bg-white rounded-2xl shadow-xl p-6">
-              <h3 className="text-2xl font-semibold mb-6 text-indigo-700 border-b-2 border-indigo-200 pb-3">Notifications</h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-semibold text-indigo-700 border-b-2 border-indigo-200 pb-3">
+                  Notifications
+                </h3>
+                <button
+                  onClick={() => navigate('/notifications-page')}
+                  className="inline-flex items-center px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-sm hover:bg-indigo-700 transition"
+                  title="View all notifications"
+                >
+                  View all
+                </button>
+              </div>
+
               <ul className="space-y-4">
-                {filteredNotifications.length === 0 ? (
+                {latestThreeNotifications.length === 0 ? (
                   <p className="text-gray-500">No notifications found.</p>
                 ) : (
-                  filteredNotifications.map((n, i) => (
-                    <li key={i} className="border p-4 rounded-lg bg-purple-50 hover:bg-purple-100 transition-all flex items-center">
+                  latestThreeNotifications.map((n, i) => (
+                    <li key={n?.id ?? i} className="border p-4 rounded-lg bg-purple-50 hover:bg-purple-100 transition-all flex items-center">
                       <Bell className="w-6 h-6 text-indigo-600 mr-3" />
                       <div>
-                        <p className="font-semibold text-base">{n.message || n}</p>
+                        <p className="font-semibold text-base">{n?.message || String(n)}</p>
                         <p className="text-xs text-gray-400">
-                          {new Date(n.timestamp || Date.now()).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}
+                          {new Date(n?.timestamp || Date.now()).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
                         </p>
                       </div>
                     </li>
@@ -445,3 +494,4 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+

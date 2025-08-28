@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Bell, FileText, User, Menu, X, BarChart2, Activity, AlertTriangle, Users, Settings } from 'lucide-react';
+import { Bell, FileText, User, Menu, X, BarChart2, Activity, AlertTriangle, Users, BellDot} from 'lucide-react';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import { gsap } from 'gsap';
@@ -178,13 +178,13 @@ const Dashboard = () => {
                   <hr className="border-t border-gray-500 my-1" />
                   <Link to="/submit-query" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><FileText className="w-5 h-5 mr-2" /> Submit Query</Link>
                   <hr className="border-t border-gray-500 my-1" />
-                  <Link to="/announcements" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><Bell className="w-5 h-5 mr-2" /> Announcements</Link>
+                  <Link to="/announcements" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><Bell className="w-5 h-5 mr-2" />Announcements</Link>
                   <hr className="border-t border-gray-500 my-1" />
                   <Link to="/support" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><AlertTriangle className="w-5 h-5 mr-2" /> Support</Link>
                   <hr className="border-t border-gray-500 my-1" />
                   <Link to="/profile" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><User className="w-5 h-5 mr-2" /> Profile</Link>
                   <hr className="border-t border-gray-500 my-1" />
-                  <Link to="/settings" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><Settings className="w-5 h-5 mr-2" /> Settings</Link>
+                  <Link to="/notifications-page" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><BellDot className="w-5 h-5 mr-2" /> Notifications</Link>
                   <hr className="border-t border-gray-500 my-1" />
                   <button
                     onClick={handleLogout}
@@ -215,7 +215,7 @@ const Dashboard = () => {
                   <hr className="border-t border-gray-500 my-1" />
                   <Link to="/profile" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><User className="w-5 h-5 mr-2" /> Profile</Link>
                   <hr className="border-t border-gray-500 my-1" />
-                  <Link to="/settings" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><Settings className="w-5 h-5 mr-2" /> Settings</Link>
+                  <Link to="/notifications-page" className="block py-2 px-4 text-lg hover:bg-indigo-600 rounded flex items-center"><BellDot className="w-5 h-5 mr-2" /> Notifications</Link>
                   <hr className="border-t border-gray-500 my-1" />
                   <button
                     onClick={handleLogout}
