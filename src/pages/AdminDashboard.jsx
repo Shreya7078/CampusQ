@@ -1,11 +1,8 @@
-
-
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AlertTriangle, Users, BarChart2, User, Search, Plus, Bell } from 'lucide-react';
 import { gsap } from 'gsap';
 import Chart from 'chart.js/auto';
-import Navbar from '../Components/Navbar';
 
 const LAST_SEEN_TS_KEY = 'lastSeenAdminNotifTs';
 
@@ -24,22 +21,23 @@ const AdminDashboard = () => {
   });
   const [editUser, setEditUser] = useState(null);
   const [notifications, setNotifications] = useState([]);
-  const [notifsSeen, setNotifsSeen] = useState(true);
-
   const contentRef = useRef(null);
   const notificationsRef = useRef(null);
-  const navigate = useNavigate();
-  const location = useLocation();
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
-  const [lastNotifCount, setLastNotifCount] = useState(() => {
-    return Number(localStorage.getItem('lastSeenAdminNotifCount')) || 0;
-  });
+  const navigate = useNavigate();
+  const [lastNotifCount, setLastNotifCount] = useState(() => Number(localStorage.getItem('lastSeenAdminNotifCount')) || 0);
 
-  const refreshUsers = () => {
-    const savedUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    setUsers(savedUsers);
+  // --- Helper: Format date only (for Manage Queries table) ---
+  const formatDateOnly = (dateStr) => {
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
+
+  const refreshUsers = () => setUsers(JSON.parse(localStorage.getItem('users') || '[]'));
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
@@ -53,33 +51,17 @@ const AdminDashboard = () => {
     return latest?.timestamp || null;
   }, [notifications]);
 
-  const hasNew = useMemo(() => {
-    return notifications.length > lastNotifCount;
-  }, [notifications, lastNotifCount]);
-
-  useEffect(() => {
-    if (notifications.length > lastNotifCount) {
-      // dot via hasNew
-    } else if (notifications.length < lastNotifCount) {
-      // dot via hasNew
-    }
-  }, [notifications, lastNotifCount]);
+  const hasNew = useMemo(() => notifications.length > lastNotifCount, [notifications, lastNotifCount]);
 
   const markNotifsSeen = () => {
-    if (latestNotifTs) {
-      localStorage.setItem(LAST_SEEN_TS_KEY, latestNotifTs);
-    }
+    if (latestNotifTs) localStorage.setItem(LAST_SEEN_TS_KEY, latestNotifTs);
   };
 
   const scrollToNotifications = () => {
     markNotifsSeen();
     localStorage.setItem('lastSeenAdminNotifCount', notifications.length);
     setLastNotifCount(notifications.length);
-    setTimeout(() => {
-      if (notificationsRef.current) {
-        notificationsRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
+    setTimeout(() => notificationsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
   };
 
   useEffect(() => {
@@ -148,7 +130,7 @@ const AdminDashboard = () => {
               : [
                   {
                     label: '',
-                    data: [0,0,0],
+                    data: [0, 0, 0],
                     backgroundColor: 'rgba(0,0,0,0)',
                     borderColor: 'rgba(0,0,0,0)',
                   },
@@ -170,7 +152,6 @@ const AdminDashboard = () => {
       });
     }
 
-    // Entrance animation (same feel as student)
     const ctxAnimation = gsap.context(() => {
       if (!contentRef.current) return;
       gsap.from(contentRef.current.children, {
@@ -183,28 +164,20 @@ const AdminDashboard = () => {
     });
 
     const onStorage = (e) => {
-      if (e.key === 'adminNotifications') {
-        setNotifications(JSON.parse(e.newValue || '[]'));
-      }
-      if (e.key === 'queries') {
-        setQueries(JSON.parse(e.newValue || '[]'));
-      }
+      if (e.key === 'adminNotifications') setNotifications(JSON.parse(e.newValue || '[]'));
+      if (e.key === 'queries') setQueries(JSON.parse(e.newValue || '[]'));
     };
     window.addEventListener('storage', onStorage);
 
     const onFocus = () => {
-      const freshNotifs = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
-      setNotifications(freshNotifs);
-      const freshQueries = JSON.parse(localStorage.getItem('queries') || '[]');
-      setQueries(freshQueries);
+      setNotifications(JSON.parse(localStorage.getItem('adminNotifications') || '[]'));
+      setQueries(JSON.parse(localStorage.getItem('queries') || '[]'));
     };
     window.addEventListener('focus', onFocus);
 
     const interval = setInterval(() => {
-      const freshNotifs = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
-      setNotifications(freshNotifs);
-      const freshQs = JSON.parse(localStorage.getItem('queries') || '[]');
-      setQueries(freshQs);
+      setNotifications(JSON.parse(localStorage.getItem('adminNotifications') || '[]'));
+      setQueries(JSON.parse(localStorage.getItem('queries') || '[]'));
     }, 3000);
 
     return () => {
@@ -227,6 +200,7 @@ const AdminDashboard = () => {
       user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // --- Add/Edit/Delete functions (same as previous) ---
   const handleAddUser = (e) => {
     e.preventDefault();
     const isStudent = newUser.role === 'Student';
@@ -244,14 +218,7 @@ const AdminDashboard = () => {
     setUsers(updatedUsers);
     localStorage.setItem('users', JSON.stringify(updatedUsers));
 
-    setNewUser({
-      name: '',
-      email: '',
-      role: 'Student',
-      department: '',
-      studentId: '',
-      adminRole: '',
-    });
+    setNewUser({ name: '', email: '', role: 'Student', department: '', studentId: '', adminRole: '' });
     setShowForm(false);
     refreshUsers();
   };
@@ -296,6 +263,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col" ref={contentRef}>
+      {/* Top Header */}
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-700 to-pink-500">
           Welcome, Admin!
@@ -311,8 +279,8 @@ const AdminDashboard = () => {
         </button>
       </div>
 
+      {/* Manage Queries Table */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Manage Queries */}
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-indigo-400/40 transition-all duration-300 border border-indigo-100 lg:col-span-3">
           <h3 className="text-xl font-semibold mb-5 text-indigo-700 flex items-center">
             <AlertTriangle className="w-6 h-6 mr-3" /> Manage Queries
@@ -331,26 +299,23 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {queries
-                  .filter((q) => q.status === 'Pending')
-                  .slice(0, 5)
-                  .map((q) => (
-                    <tr key={q.id} className="border-t hover:bg-indigo-50/50 transition-colors">
-                      <td className="p-4 text-center">{q.id}</td>
-                      <td className="p-4">{q.category}</td>
-                      <td className="p-4 text-center">{q.title}</td>
-                      <td className="p-4 text-center">{q.status}</td>
-                      <td className="p-4 text-center whitespace-nowrap">{q.date}</td>
-                      <td className="p-4 text-center">
-                        <Link
-                          to="/manage-queries"
-                          className="px-3 py-1.5 bg-gradient-to-r from-blue-800 to-blue-500 text-white rounded-lg shadow-md hover:from-blue-700 hover:to-blue-400 hover:shadow-lg transition-all duration-200"
-                        >
-                          View
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
+                {queries.filter((q) => q.status === 'Pending').slice(0, 5).map((q) => (
+                  <tr key={q.id} className="border-t hover:bg-indigo-50/50 transition-colors">
+                    <td className="p-4 text-center">{q.id}</td>
+                    <td className="p-4">{q.category}</td>
+                    <td className="p-4 text-center">{q.title}</td>
+                    <td className="p-4 text-center">{q.status}</td>
+                    <td className="p-4 text-center whitespace-nowrap">{formatDateOnly(q.date)}</td>
+                    <td className="p-4 text-center">
+                      <Link
+                        to="/manage-queries"
+                        className="px-3 py-1.5 bg-gradient-to-r from-blue-800 to-blue-500 text-white rounded-lg shadow-md hover:from-blue-700 hover:to-blue-400 hover:shadow-lg transition-all duration-200"
+                      >
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -362,6 +327,8 @@ const AdminDashboard = () => {
             View All Queries
           </Link>
         </div>
+
+
 
         {/* Reports */}
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-green-400/40 transition-all duration-300 border border-green-100">

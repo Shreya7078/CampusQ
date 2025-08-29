@@ -23,7 +23,7 @@ const StudentDashboard = () => {
 
   const hasNew = localNotifications.length > lastNotifCount;
 
-  // Helper function to format date/time
+  // Full date + time formatter for query cards
   const formatDateTime = (dateStr) => {
     const d = new Date(dateStr);
     const day = String(d.getDate()).padStart(2, '0');
@@ -34,9 +34,18 @@ const StudentDashboard = () => {
     const seconds = String(d.getSeconds()).padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
-    hours = hours ? hours : 12; // hour '0' should be 12
+    hours = hours ? hours : 12;
     const hoursStr = String(hours).padStart(2, '0');
     return `${day}/${month}/${year}, ${hoursStr}:${minutes}:${seconds} ${ampm}`;
+  };
+
+  // Date only formatter for Recent Activity
+  const formatDateOnly = (dateStr) => {
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   useEffect(() => {
@@ -164,10 +173,10 @@ const StudentDashboard = () => {
           </h3>
           <div className="space-y-3">
             <p className="text-gray-600">
-              Query Submitted: {latestSubmittedQuery ? formatDateTime(latestSubmittedQuery.date) : 'N/A'}
+              Query Submitted: {latestSubmittedQuery ? formatDateOnly(latestSubmittedQuery.date) : 'N/A'}
             </p>
             <p className="text-gray-600">
-              Query Resolved: {latestResolvedQuery ? formatDateTime(latestResolvedQuery.date) : 'N/A'}
+              Query Resolved: {latestResolvedQuery ? formatDateOnly(latestResolvedQuery.date) : 'N/A'}
             </p>
           </div>
         </div>

@@ -152,9 +152,9 @@ const ManageQueries = () => {
           <h1 className="hero-text text-4xl md:text-5xl font-bold leading-normal pb-1 bg-gradient-to-r from-indigo-600 to-pink-500 text-transparent bg-clip-text">
             Manage Queries
           </h1>
-          <p className="hero-text text-lg text-gray-700 mt-2 md:mt-3">
+          {/* <p className="hero-text text-lg text-gray-700 mt-2 md:mt-3">
             Review, edit, and resolve campus queries efficiently.
-          </p>
+          </p> */}
         </div>
       </section>
 
@@ -222,8 +222,8 @@ const ManageQueries = () => {
                           return (
                             <li key={`${query.id}-h-${i}`}>
                               {text}
-                              {ts ? <span className="text-[10px] text-gray-400"> — {ts}</span> : null}
-                            </li>
+                              {ts ? <span className="text-[10px] text-gray-400"></span> : null}
+                            </li> 
                           );
                         })}
                       </ul>
@@ -322,7 +322,7 @@ const ManageQueries = () => {
               </div>
 
               <div>
-                <label className="block text-gray-800 mb-2 font-poppins font-semibold">History (optional quick note):</label>
+                <label className="block text-gray-800 mb-2 font-poppins font-semibold">History:</label>
                 <input
                   type="text"
                   value={''}
