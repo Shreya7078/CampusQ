@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Edit, Mail, LogOut, Bell, CheckCircle } from 'lucide-react';
@@ -33,7 +32,12 @@ const ProfilePage = () => {
   const [toastMessage, setToastMessage] = useState('');
   const toastRef = useRef(null);
 
-  
+  // Helper: Format date in Indian format (date only)
+  const formatDateIN = (dateStr) => {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+  };
+
   const addAdminNotification = (message) => {
     const saved = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
     const now = new Date();
@@ -43,7 +47,6 @@ const ProfilePage = () => {
     setAdminNotifications(updated);
   };
 
-  
   useEffect(() => {
     if (!isAuthenticated) return;
     setRole(localStorage.getItem('userRole') || 'student');
@@ -75,29 +78,41 @@ const ProfilePage = () => {
     }
   }, [isAuthenticated, role]);
 
-  useEffect(() => {
-    if (!isAuthenticated) return;
+useEffect(() => {
+  if (!isAuthenticated || role !== 'student') return;
 
-    const now = new Date();
-    if (role === 'student') {
-      const savedQueries = JSON.parse(localStorage.getItem('queries') || '[]');
-      const studentNotifications = savedQueries
-        .filter(q => q.studentId === userDetails.studentId && q.status === 'Resolved')
-        .map(q => ({
-          id: q.id,
-          message: `Your query "${q.title}" (ID: ${q.id}) has been resolved on ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`,
-          studentId: userDetails.studentId,
-          timestamp: now.toISOString()
-        }))
-        .filter(n => !notifications.some(existing => existing.id === n.id));
+  const savedQueries = JSON.parse(localStorage.getItem('queries') || '[]');
+  const savedNotifications = JSON.parse(localStorage.getItem('studentNotifications') || '[]');
 
-      if (studentNotifications.length > 0) {
-        studentNotifications.forEach(n => dispatch({ type: 'ADD_NOTIFICATION', payload: n }));
-      }
+  const newNotifications = savedQueries
+    .filter(q => q.studentId === userDetails.studentId && q.status === 'Resolved')
+    .map(q => {
+      // Check if notification already exists
+      const exists = savedNotifications.find(n => n.id === q.id);
+      if (exists) return exists; // Keep old notification with original timestamp
+
+      // If new, create with current timestamp
+      return {
+        id: q.id,
+        message: `Your query "${q.title}" (ID: ${q.id}) has been resolved`,
+        studentId: userDetails.studentId,
+        timestamp: new Date().toISOString()
+      };
+    });
+
+  // Update localStorage
+  localStorage.setItem('studentNotifications', JSON.stringify(newNotifications));
+
+  // Update context
+  newNotifications.forEach(n => {
+    if (!notifications.some(existing => existing.id === n.id)) {
+      dispatch({ type: 'ADD_NOTIFICATION', payload: n });
     }
-  }, [isAuthenticated, role, userDetails.studentId, dispatch, notifications]);
+  });
 
-  
+}, [isAuthenticated, role, userDetails.studentId, dispatch, notifications]);
+
+
   const lastQueryCountRef = useRef(null);
   useEffect(() => {
     if (!isAuthenticated || role !== 'admin') return;
@@ -150,7 +165,6 @@ const ProfilePage = () => {
     localStorage.setItem('lastQueriesSnapshot', JSON.stringify(savedQueries));
   }, [isAuthenticated, role, queries]);
 
- 
   useEffect(() => {
     gsap.fromTo(
       '.profile-card, .main-card',
@@ -161,7 +175,6 @@ const ProfilePage = () => {
 
   const handleEdit = () => setIsEditing(true);
 
-  
   const handleSave = () => {
     setUserDetails(editedDetails);
     if (role === 'student') {
@@ -225,6 +238,16 @@ const ProfilePage = () => {
       .slice(0, 3);
   }, [filteredNotifications]);
 
+  const latestThreeStudentNotifications = useMemo(() => {
+    if (role !== 'student') return [];
+    const arr = JSON.parse(localStorage.getItem('studentNotifications') || '[]');
+    const uniq = [], seen = new Set();
+    arr.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(n => {
+      if (!seen.has(n.id)) { uniq.push(n); seen.add(n.id); }
+    });
+    return uniq.slice(0, 3);
+  }, [role]);
+
   const latestThreeManagedQueries = useMemo(() => {
     if (role !== 'admin') return filteredQueries;
     const list = Array.isArray(filteredQueries) ? filteredQueries : [];
@@ -233,9 +256,29 @@ const ProfilePage = () => {
       .slice(0, 3);
   }, [filteredQueries, role]);
 
+  const filteredQueryHistory = useMemo(() => {
+    let studentQueries = [];
+    if (role === 'student') {
+      studentQueries = queries.filter(q => q.studentId === userDetails.studentId);
+      // Sort descending by date
+      studentQueries.sort((a, b) => new Date(b.date) - new Date(a.date));
+      // Take only top 3 latest
+      return studentQueries.slice(0, 3);
+    }  return queries;
+  }, [queries, role, userDetails.studentId]);
+
+  const formatINDateTime = (isoStr) => {
+  if (!isoStr) return '';
+  const d = new Date(isoStr);
+  const date = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+  let time = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
+  // Remove any extra spaces from time string if needed
+  time = time.replace(/\s/g, '');
+  return { date, time };
+};
+
   return (
     <div className="min-h-screen pt-10 flex flex-col bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 font-poppins text-gray-800 mt-6">
-    
       {showToast && (
         <div
           ref={toastRef}
@@ -246,11 +289,9 @@ const ProfilePage = () => {
         </div>
       )}
 
-     
       <div className="flex-grow max-w-7xl mx-auto py-12 px-4 md:px-8 grid md:grid-cols-3 gap-10">
-      
+        {/* Profile Card */}
         <div className="space-y-6">
-          
           <div className="profile-card bg-white p-[1px] rounded-2xl shadow-xl">
             <div className="bg-white rounded-2xl p-6 flex flex-col items-center text-center">
               <div className="w-28 h-28 bg-gradient-to-br from-indigo-200 to-purple-200 rounded-full flex items-center justify-center shadow-md mb-4">
@@ -295,7 +336,7 @@ const ProfilePage = () => {
             </div>
           </div>
 
-    
+          {/* Stats Card */}
           <div className="bg-white p-[1px] rounded-2xl shadow-xl">
             <div className="bg-white rounded-2xl p-6">
               <h3 className="text-base font-semibold text-gray-700 mb-5">Your Stats</h3>
@@ -321,8 +362,9 @@ const ProfilePage = () => {
           </div>
         </div>
 
+        {/* Main Cards */}
         <div className="main-card md:col-span-2 space-y-10">
-        
+          {/* Profile Information */}
           <div className="bg-white rounded-2xl shadow-xl p-6">
             <h3 className="text-2xl font-semibold mb-6 text-indigo-700 border-b-2 border-indigo-200 pb-3">Profile Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -339,6 +381,7 @@ const ProfilePage = () => {
                   <p className="font-medium text-lg">{editedDetails.email}</p>
                 )}
               </div>
+
               {role === 'student' ? (
                 <>
                   <div>
@@ -396,9 +439,9 @@ const ProfilePage = () => {
             )}
           </div>
 
-        
+          {/* Queries & Notifications */}
           <div className="grid md:grid-cols-2 gap-8">
-            
+            {/* Query Section */}
             <div className="bg-white rounded-2xl shadow-xl p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-semibold text-indigo-700 border-b-2 border-indigo-200 pb-3">
@@ -424,7 +467,7 @@ const ProfilePage = () => {
                       <li key={q.id} className="border p-4 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-all">
                         <p className="font-semibold text-base">{q.title}</p>
                         <p className="text-sm text-gray-500">{q.status}</p>
-                        <p className="text-xs text-gray-400">{q.date}</p>
+                        <p className="text-xs text-gray-400">{formatDateIN(q.date)}</p>
                         {q.attachment && (
                           <img src={q.attachment} alt="Attachment" className="mt-2 max-w-full h-auto rounded-lg" />
                         )}
@@ -432,25 +475,23 @@ const ProfilePage = () => {
                     ))
                   ))
                 ) : (
-                  (filteredQueries.length === 0 ? (
+                  (filteredQueryHistory.length === 0 ? (
                     <p className="text-gray-500">No queries found.</p>
                   ) : (
-                    filteredQueries.map((q) => (
+                    filteredQueryHistory.map(q => (
                       <li key={q.id} className="border p-4 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-all">
                         <p className="font-semibold text-base">{q.title}</p>
                         <p className="text-sm text-gray-500">{q.status}</p>
-                        <p className="text-xs text-gray-400">{q.date}</p>
-                        {q.attachment && (
-                          <img src={q.attachment} alt="Attachment" className="mt-2 max-w-full h-auto rounded-lg" />
-                        )}
+                        <p className="text-xs text-gray-400">{formatDateIN(q.date)}</p>
+                        {q.attachment && <img src={q.attachment} alt="Attachment" className="mt-2 max-w-full h-auto rounded-lg" />}
                       </li>
                     ))
                   ))
                 )}
-              </ul>
+                </ul>
             </div>
 
-      
+            {/* Notifications Section */}
             <div className="bg-white rounded-2xl shadow-xl p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-semibold text-indigo-700 border-b-2 border-indigo-200 pb-3">
@@ -466,20 +507,43 @@ const ProfilePage = () => {
               </div>
 
               <ul className="space-y-4">
-                {latestThreeNotifications.length === 0 ? (
-                  <p className="text-gray-500">No notifications found.</p>
+                {role === 'student' ? (
+                  latestThreeStudentNotifications.length === 0 ? (
+                    <p className="text-gray-500">No notifications found</p>
+                  ) : (
+                    latestThreeStudentNotifications.map((n, i) => {
+                      let queryTitle = "Your query";
+                      const match = n.message?.match(/"([^"]+)"/);
+                      if (match) queryTitle = `your query ${match[1]}`;
+                      const { date, time } = formatINDateTime(n.timestamp);
+                      return (
+                        <li key={n?.id ?? i} className="border p-4 rounded-lg bg-purple-50 hover:bg-purple-100 transition-all flex items-center">
+                          <Bell className="w-6 h-6 text-indigo-600 mr-3" />
+                          <div>
+                            <p className="font-semibold text-base">
+                              {n?.message || String(n)} on {date} at {time}.
+                            </p>
+                          </div>
+                        </li>
+                      );
+                    })
+                  )
                 ) : (
-                  latestThreeNotifications.map((n, i) => (
-                    <li key={n?.id ?? i} className="border p-4 rounded-lg bg-purple-50 hover:bg-purple-100 transition-all flex items-center">
-                      <Bell className="w-6 h-6 text-indigo-600 mr-3" />
-                      <div>
-                        <p className="font-semibold text-base">{n?.message || String(n)}</p>
-                        <p className="text-xs text-gray-400">
-                          {new Date(n?.timestamp || Date.now()).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
-                        </p>
-                      </div>
-                    </li>
-                  ))
+                  latestThreeNotifications.length === 0 ? (
+                    <p className="text-gray-500">No notifications found</p>
+                  ) : (
+                    latestThreeNotifications.map((n, i) => (
+                      <li key={n?.id ?? i} className="border p-4 rounded-lg bg-purple-50 hover:bg-purple-100 transition-all flex items-center">
+                        <Bell className="w-6 h-6 text-indigo-600 mr-3" />
+                        <div>
+                          <p className="font-semibold text-base">{n?.message || String(n)}</p>
+                          <p className="text-xs text-gray-400">
+                            {n?.timestamp ? new Date(n.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : ''}
+                          </p>
+                        </div>
+                      </li>
+                    ))
+                  )
                 )}
               </ul>
             </div>
@@ -487,11 +551,9 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
 };
 
 export default ProfilePage;
-

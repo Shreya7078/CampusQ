@@ -24,20 +24,21 @@ const StudentDashboard = () => {
   const hasNew = localNotifications.length > lastNotifCount;
 
   // Full date + time formatter for query cards
-  const formatDateTime = (dateStr) => {
-    const d = new Date(dateStr);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    let hours = d.getHours();
-    const minutes = String(d.getMinutes()).padStart(2, '0');
-    const seconds = String(d.getSeconds()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const hoursStr = String(hours).padStart(2, '0');
-    return `${day}/${month}/${year}, ${hoursStr}:${minutes}:${seconds} ${ampm}`;
-  };
+    const formatDateTime = (dateStr) => {
+      const d = new Date(dateStr);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      let hours = d.getHours();
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      const seconds = String(d.getSeconds()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const hoursStr = String(hours).padStart(2, '0');
+      return `${day}/${month}/${year} `;
+      // ${hoursStr}:${minutes}:${seconds} ${ampm}`;
+    };
 
   // Date only formatter for Recent Activity
   const formatDateOnly = (dateStr) => {
@@ -198,7 +199,7 @@ const StudentDashboard = () => {
                 >
                   <h4 className="text-lg font-medium text-indigo-700">{query.category} Queries</h4>
                   <p className="mt-2 text-gray-600">{query.title}</p>
-                  <p className="text-sm text-gray-500">{formatDateTime(query.date)}</p>
+                  <p className="text-sm text-gray-500" style={{ whiteSpace: 'pre-line' }}>{formatDateTime(query.date)}</p>
                   <span
                     className={`mt-2 px-2 py-1 rounded-full text-sm ${
                       query.status === 'Resolved'

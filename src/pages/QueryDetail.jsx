@@ -11,13 +11,33 @@ const QueryDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState({});
 
-
   const addAdminNotification = (message) => {
     const saved = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
     const now = new Date();
     const newNotif = { id: Date.now(), message, timestamp: now.toISOString() };
     const updated = [...saved, newNotif];
     localStorage.setItem('adminNotifications', JSON.stringify(updated));
+  };
+
+  // Helper to format date and time in India timezone and desired format
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const seconds = String(d.getSeconds()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hoursStr = String(hours).padStart(2, '0');
+
+    // Return string showing date and time on separate lines for clarity (use <br/> in render)
+    return `${day}/${month}/${year} ${hoursStr}:${minutes}:${seconds} ${ampm}`;
   };
 
   useEffect(() => {
@@ -54,18 +74,15 @@ const QueryDetail = () => {
       return;
     }
 
-    
     dispatch({
       type: 'UPDATE_QUERY',
       payload: { id: query.id, updatedData: editedData },
     });
 
-    
     const saved = JSON.parse(localStorage.getItem('queries') || '[]');
     const updated = saved.map((q) => (q.id === query.id ? { ...q, ...editedData } : q));
     localStorage.setItem('queries', JSON.stringify(updated));
 
-    
     setQuery((prev) => (prev ? { ...prev, ...editedData } : prev));
     setIsEditing(false);
   };
@@ -74,18 +91,14 @@ const QueryDetail = () => {
     if (!query) return;
     if (!window.confirm('Are you sure you want to delete this query?')) return;
 
-   
     const saved = JSON.parse(localStorage.getItem('queries') || '[]');
     const toDelete = saved.find((q) => String(q.id) === String(query.id));
 
-   
     const updated = saved.filter((q) => String(q.id) !== String(query.id));
     localStorage.setItem('queries', JSON.stringify(updated));
 
-  
     dispatch({ type: 'DELETE_QUERY', payload: { id: query.id } });
 
-    
     if (toDelete) {
       const studentDetails = JSON.parse(localStorage.getItem('studentDetails') || '{}');
       const studentId = toDelete.studentId || studentDetails.studentId || 'S001';
@@ -94,7 +107,6 @@ const QueryDetail = () => {
       );
     }
 
-   
     navigate('/student-dashboard');
   };
 
@@ -182,12 +194,19 @@ const QueryDetail = () => {
           <p>
             <strong>Status:</strong> {query.status}
           </p>
+
           <p>
-            <strong>Date:</strong> {query.date}
+            <strong>Date:</strong>{' '}
+            <span style={{ whiteSpace: 'pre-line' }}>{formatDateTime(query.date)}</span>
           </p>
 
           {query.attachment && (
-            <a href={query.attachment} target="_blank" rel="noopener noreferrer" className="text-blue-500">
+            <a
+              href={query.attachment}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500"
+            >
               View Attachment
             </a>
           )}
