@@ -18,7 +18,7 @@ const QueryDetail = () => {
     const updated = [...saved, newNotif];
     localStorage.setItem('adminNotifications', JSON.stringify(updated));
   };
-
+  
   
   const formatDateTime = (dateStr) => {
     if (!dateStr) return '';
@@ -37,8 +37,12 @@ const QueryDetail = () => {
     const hoursStr = String(hours).padStart(2, '0');
 
     
-    return `${day}/${month}/${year} ${hoursStr}:${minutes}:${seconds} ${ampm}`;
+    return {
+      date: `${day}/${month}/${year}`,
+      time: `${hoursStr}:${minutes}:${seconds} ${ampm}`
+    };
   };
+
 
   useEffect(() => {
     const foundQuery = queries.find((q) => String(q.id) === String(id));
@@ -136,45 +140,46 @@ const QueryDetail = () => {
 
           <div>
             <label className="block text-gray-800 mb-2">
-              <strong>Title:</strong>
+              <strong>Title:</strong>{' '}
+              {!isEditing && <span>{query.title}</span>}
             </label>
-            {isEditing ? (
+            {isEditing && (
               <input
                 type="text"
                 name="title"
                 value={editedData.title}
                 onChange={handleChange}
                 className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                disabled={isResolved}
+                disabled={isEditing && query.status === 'Resolved'}
               />
-            ) : (
-              <p>{query.title}</p>
             )}
           </div>
 
+
           <div>
             <label className="block text-gray-800 mb-2">
-              <strong>Description:</strong>
+              <strong>Description:</strong>{' '}
+              {!isEditing && <span>{query.description}</span>}
             </label>
             {isEditing ? (
               <textarea
                 name="description"
                 value={editedData.description}
                 onChange={handleChange}
-                className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-2 bg-gray-100/10 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 ring-indigo-500"
                 rows={3}
                 disabled={isResolved}
               />
-            ) : (
-              <p>{query.description}</p>
-            )}
+            ) : null}
           </div>
+
 
           <div>
             <label className="block text-gray-800 mb-2">
-              <strong>Priority:</strong>
+              <strong>Priority:</strong>{' '}
+              {!isEditing && <span>{query.priority}</span>}
             </label>
-            {isEditing ? (
+            {isEditing && (
               <select
                 name="priority"
                 value={editedData.priority}
@@ -186,19 +191,23 @@ const QueryDetail = () => {
                 <option value="Medium">Medium</option>
                 <option value="High">High</option>
               </select>
-            ) : (
-              <p>{query.priority}</p>
             )}
           </div>
+
 
           <p>
             <strong>Status:</strong> {query.status}
           </p>
 
-          <p>
-            <strong>Date:</strong>{' '}
-            <span style={{ whiteSpace: 'pre-line' }}>{formatDateTime(query.date)}</span>
-          </p>
+          {query && (() => {
+            const { date, time } = formatDateTime(query.date);
+            return (
+              <>
+                <p><strong>Date:</strong> {date}</p>
+                <p><strong>Time:</strong> {time}</p>
+              </>
+            );
+          })()}
 
           {query.attachment && (
             <a
@@ -211,7 +220,7 @@ const QueryDetail = () => {
             </a>
           )}
 
-          <div className="flex gap-4 mt-6">
+          <div className="flex  gap-4 mt-6">
             {!isEditing ? (
               <button
                 onClick={handleEdit}
