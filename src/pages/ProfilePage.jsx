@@ -32,7 +32,7 @@ const ProfilePage = () => {
   const [toastMessage, setToastMessage] = useState('');
   const toastRef = useRef(null);
 
-  // Helper: Format date in Indian format (date only)
+ 
   const formatDateIN = (dateStr) => {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
@@ -87,11 +87,11 @@ useEffect(() => {
   const newNotifications = savedQueries
     .filter(q => q.studentId === userDetails.studentId && q.status === 'Resolved')
     .map(q => {
-      // Check if notification already exists
+  
       const exists = savedNotifications.find(n => n.id === q.id);
-      if (exists) return exists; // Keep old notification with original timestamp
+      if (exists) return exists; 
 
-      // If new, create with current timestamp
+      
       return {
         id: q.id,
         message: `Your query "${q.title}" (ID: ${q.id}) has been resolved`,
@@ -100,10 +100,10 @@ useEffect(() => {
       };
     });
 
-  // Update localStorage
+ 
   localStorage.setItem('studentNotifications', JSON.stringify(newNotifications));
 
-  // Update context
+  
   newNotifications.forEach(n => {
     if (!notifications.some(existing => existing.id === n.id)) {
       dispatch({ type: 'ADD_NOTIFICATION', payload: n });
@@ -260,9 +260,7 @@ useEffect(() => {
     let studentQueries = [];
     if (role === 'student') {
       studentQueries = queries.filter(q => q.studentId === userDetails.studentId);
-      // Sort descending by date
       studentQueries.sort((a, b) => new Date(b.date) - new Date(a.date));
-      // Take only top 3 latest
       return studentQueries.slice(0, 3);
     }  return queries;
   }, [queries, role, userDetails.studentId]);
@@ -272,7 +270,7 @@ useEffect(() => {
   const d = new Date(isoStr);
   const date = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
   let time = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
-  // Remove any extra spaces from time string if needed
+ 
   time = time.replace(/\s/g, '');
   return { date, time };
 };
@@ -290,7 +288,7 @@ useEffect(() => {
       )}
 
       <div className="flex-grow max-w-7xl mx-auto py-12 px-4 md:px-8 grid md:grid-cols-3 gap-10">
-        {/* Profile Card */}
+       
         <div className="space-y-6">
           <div className="profile-card bg-white p-[1px] rounded-2xl shadow-xl">
             <div className="bg-white rounded-2xl p-6 flex flex-col items-center text-center">
@@ -336,7 +334,7 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Stats Card */}
+          
           <div className="bg-white p-[1px] rounded-2xl shadow-xl">
             <div className="bg-white rounded-2xl p-6">
               <h3 className="text-base font-semibold text-gray-700 mb-5">Your Stats</h3>
@@ -362,9 +360,9 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Main Cards */}
+       
         <div className="main-card md:col-span-2 space-y-10">
-          {/* Profile Information */}
+          
           <div className="bg-white rounded-2xl shadow-xl p-6">
             <h3 className="text-2xl font-semibold mb-6 text-indigo-700 border-b-2 border-indigo-200 pb-3">Profile Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -439,9 +437,9 @@ useEffect(() => {
             )}
           </div>
 
-          {/* Queries & Notifications */}
+          
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Query Section */}
+           
             <div className="bg-white rounded-2xl shadow-xl p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-semibold text-indigo-700 border-b-2 border-indigo-200 pb-3">
@@ -537,9 +535,9 @@ useEffect(() => {
                         <Bell className="w-6 h-6 text-indigo-600 mr-3" />
                         <div>
                           <p className="font-semibold text-base">{n?.message || String(n)}</p>
-                          <p className="text-xs text-gray-400">
+                          {/* <p className="text-xs text-gray-400">
                             {n?.timestamp ? new Date(n.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : ''}
-                          </p>
+                          </p> */}
                         </div>
                       </li>
                     ))

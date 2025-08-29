@@ -18,7 +18,7 @@ const ManageQueries = () => {
   const queriesPerPage = 10;
   const [adminUsers] = useState(['Admin1', 'Admin2', 'Admin3']);
 
-  // Smooth, contained animations
+  
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     const userRole = localStorage.getItem('userRole');
@@ -27,7 +27,7 @@ const ManageQueries = () => {
       return;
     }
 
-    // Contained card reveal (no bounce; no overflow)
+    
     gsap.from('.query-card', {
       y: 24,
       opacity: 0,
@@ -56,7 +56,7 @@ const ManageQueries = () => {
     });
   }, [queries, searchTerm]);
 
-  // Pagination
+  
   const totalPages = Math.max(1, Math.ceil(filteredQueries.length / queriesPerPage));
   const currentPageSafe = Math.min(currentPage, totalPages);
   const indexOfLastQuery = currentPageSafe * queriesPerPage;
@@ -65,7 +65,7 @@ const ManageQueries = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Delete
+
   const handleDeleteQuery = (id) => {
     queryDispatch({ type: 'DELETE_QUERY', payload: { id } });
   };

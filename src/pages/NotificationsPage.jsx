@@ -235,9 +235,9 @@ const NotificationsPage = () => {
               <ul className="divide-y divide-gray-200">
                 {pageItems.map((n, i) => {
                   
-                  const when = n?.timestamp
-                    ? new Date(n.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
-                    : '—';
+                  // const when = n?.timestamp
+                  //   ? new Date(n.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+                  //   : '—';
                   return (
                     <li key={`${n?.id ?? 'notif'}-${(currentPage - 1) * PAGE_SIZE_DEFAULT + i}`} className="py-3">
                       <div className="flex items-start gap-3">

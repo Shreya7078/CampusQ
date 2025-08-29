@@ -19,7 +19,7 @@ const QueryDetail = () => {
     localStorage.setItem('adminNotifications', JSON.stringify(updated));
   };
 
-  // Helper to format date and time in India timezone and desired format
+  
   const formatDateTime = (dateStr) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
@@ -36,7 +36,7 @@ const QueryDetail = () => {
     hours = hours ? hours : 12;
     const hoursStr = String(hours).padStart(2, '0');
 
-    // Return string showing date and time on separate lines for clarity (use <br/> in render)
+    
     return `${day}/${month}/${year} ${hoursStr}:${minutes}:${seconds} ${ampm}`;
   };
 

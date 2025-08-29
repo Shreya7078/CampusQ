@@ -328,9 +328,6 @@ const AdminDashboard = () => {
           </Link>
         </div>
 
-
-
-        {/* Reports */}
         <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-green-400/40 transition-all duration-300 border border-green-100">
           <h3 className="text-xl font-semibold mb-5 text-indigo-700 flex items-center">
             <BarChart2 className="w-6 h-6 mr-3" /> Reports
@@ -421,7 +418,7 @@ const AdminDashboard = () => {
           </Link>
         </div>
 
-        {/* Notifications with top-right View all */}
+        {/* Notifications */}
         <div
           ref={notificationsRef}
           className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-yellow-400/40 transition-all duration-300 border border-yellow-100 lg:col-span-3"
