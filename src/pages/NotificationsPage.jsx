@@ -180,14 +180,14 @@ const NotificationsPage = () => {
             <h1 className="text-5xl font-bold text-transparent py-2 bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-700 to-pink-500">
               {role === 'admin' ? 'Admin Notifications' : 'My Notifications'}
             </h1>
-            <button
+            {/* <button
               onClick={markAllAsRead}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:shadow-md text-indigo-700 font-medium transition-all"
               title="Mark all as read"
             >
               <CheckCircle2 className="w-5 h-5" />
               Mark all as read
-            </button>
+            </button> */}
           </div>
 
      
